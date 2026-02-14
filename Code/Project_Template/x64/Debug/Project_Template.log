@@ -1,0 +1,12 @@
+﻿  glad.c
+  glslprogram.cpp
+  glutils.cpp
+  plane.cpp
+  teapot.cpp
+  torus.cpp
+  trianglemesh.cpp
+  main.cpp
+  scenebasic_uniform.cpp
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Project_Template.vcxproj -> C:\Uni stuff\Year 3\comp 3015\labs\Week3\Exercise 2 - Fragment shader multiple lights\Lab 1\x64\Debug\Project_Template.exe
