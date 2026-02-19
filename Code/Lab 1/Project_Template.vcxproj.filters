@@ -66,6 +66,9 @@
     <ClCompile Include="helper\texture.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="helper\skybox.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
@@ -128,6 +131,9 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\texture.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\skybox.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>

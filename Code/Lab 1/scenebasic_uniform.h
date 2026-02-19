@@ -14,6 +14,7 @@
 #include "helper/plane.h"
 #include "helper/cube.h"
 #include "helper/objmesh.h"
+#include "helper/skybox.h"
 #include "helper/texture.h"
 
 class SceneBasic_Uniform : public Scene
@@ -21,12 +22,18 @@ class SceneBasic_Uniform : public Scene
 private:
   //  GLuint vaoHandle;
     GLSLProgram prog;
+
+    GLSLProgram SkyBoxShaders;
   //  float angle;
 
     Cube cube;
 
     float angle;
     float tPrev;
+    float rotSpeed;
+
+
+    SkyBox SkyBox;
     void compile();
     Torus torus;
     Teapot teapot;

@@ -22,10 +22,23 @@ using glm::vec3;
 using glm::mat4;
 using glm::vec4;
 using glm::mat3;
+using glm::radians;
 
 float deltaTime = 0.0f;
 //Last value of time change
 float lastFrame = 0.0f;
+
+//Camera sideways rotation
+float cameraYaw = -90.0f;
+//Camera vertical rotation
+float cameraPitch = 0.0f;
+//Determines if first entry of mouse into window
+bool mouseFirstEntry = true;
+//Positions of camera from given last frame
+float cameraLastXPos = 800.0f / 2.0f;
+float cameraLastYPos = 600.0f / 2.0f;
+
+
 
 vec3 EyeCoordinates =  vec3(1.0f, 1.25f, 1.25f);
 vec3 CameraFront = vec3(0.0f, 0.0f, -1.0f);
@@ -103,19 +116,19 @@ void SceneBasic_Uniform::ProcessUserInput(int key,int action) {
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             if (key == GLFW_KEY_W) {
                 EyeCoordinates += movementSpeed * CameraFront;
-                std::cout << "Key: " << key << std::endl;
+             //   std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_A) {
                 EyeCoordinates -= normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-                std::cout << "Key: " << key << std::endl;
+               // std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_S) {
                 EyeCoordinates -= movementSpeed * CameraFront;
-                std::cout << "Key: " << key << std::endl;
+             //   std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_D) {
                 EyeCoordinates += normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-                std::cout << "Key: " << key << std::endl;
+             //   std::cout << "Key: " << key << std::endl;
             }
         }
     }
@@ -130,7 +143,46 @@ void SceneBasic_Uniform::setMatrices() {
     prog.setUniform("MVP", projection * mv);
 }
 void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
+   // std::cout << "Moving mouse" << "\n";
+    //Initially no last positions, so sets last positions to current positions
+    if (mouseFirstEntry)
+    {
+        cameraLastXPos = (float)Xpos;
+        cameraLastYPos = (float)Ypos;
+        mouseFirstEntry = false;
+    }  //Sets values for change in position since last frame to current frame
+    float xOffset = (float)Xpos - cameraLastXPos;
+    float yOffset = cameraLastYPos - (float)Ypos;
 
+    //Sets last positions to current positions for next frame
+    cameraLastXPos = (float)Xpos;
+    cameraLastYPos = (float)Ypos;
+
+    //Moderates the change in position based on sensitivity value
+    const float sensitivity = 0.025f;
+    xOffset *= sensitivity;
+    yOffset *= sensitivity;
+
+    //Adjusts yaw & pitch values against changes in positions
+    cameraYaw += xOffset;
+    cameraPitch += yOffset;
+
+    //Prevents turning up & down beyond 90 degrees to look backwards
+    if (cameraPitch > 89.0f)
+    {
+        cameraPitch = 89.0f;
+    }
+    else if (cameraPitch < -89.0f)
+    {
+        cameraPitch = -89.0f;
+    }
+
+    //Modification of direction vector based on mouse turning
+    vec3 direction;
+    direction.x = cos(radians(cameraYaw)) * cos(radians(cameraPitch));
+    direction.y = sin(radians(cameraPitch));
+    direction.z = sin(radians(cameraYaw)) * cos(radians(cameraPitch));
+    CameraFront = normalize(direction);
 }
 
 void SceneBasic_Uniform::render()
