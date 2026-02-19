@@ -26,6 +26,8 @@ private:
     GLSLProgram SkyBoxShaders;
   //  float angle;
 
+    std::unique_ptr<ObjMesh>SwordInStone;
+
     Cube cube;
 
     float angle;

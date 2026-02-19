@@ -52,6 +52,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
+    SwordInStone = ObjMesh::load("../lab 1/media/sword_in_stone.obj");
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::initScene()
@@ -239,9 +240,10 @@ void SceneBasic_Uniform::render()
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
     model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+ //   model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
-    cube.render();
+    SwordInStone->render();
+    //cube.render();
 
    // prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));
