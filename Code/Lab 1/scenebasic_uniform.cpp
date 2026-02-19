@@ -47,6 +47,8 @@ vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
+    angle(0.0f),
+    SkyBox(100.0f),
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
@@ -55,15 +57,26 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 void SceneBasic_Uniform::initScene()
 {
     compile();
+    SkyBoxShaders.use();
 
     glEnable(GL_DEPTH_TEST);
+
+    projection = mat4(1.0f);
     model = mat4(1.0f);
+    angle = glm::radians(90.0f);
+    GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../lab 1/media/texture/cube/pisa-hdr/pisa");
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
+
+    
     view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
-   // view = glm::lookAt(vec3(5.0f, 5.0f, 7.5f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-  //  model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
-  //  model = glm::rotate(model, glm::radians(15.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    prog.use();
+
     projection = mat4(1.0f);
     angle = 0.0f;
+
+    prog.use();
     prog.setUniform("Spot.L", vec3(1.0f));
     prog.setUniform("Spot.La", vec3(0.05f));
 
@@ -87,6 +100,11 @@ void SceneBasic_Uniform::compile()
         prog.compileShader("shader/NewFragmentShader.frag");
         prog.link();
         prog.use();
+
+        SkyBoxShaders.compileShader("shader/SkyBoxVertexShader.vert");
+        SkyBoxShaders.compileShader("shader/SkyBoxFragmentShader.frag");
+        SkyBoxShaders.link();
+        SkyBoxShaders.use();
     }
     catch (GLSLProgramException &e) {
         cerr << e.what() << endl;
@@ -189,6 +207,24 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
+
+    //draw sky
+    model = mat4(1.0f);
+
+
+
+    SkyBoxShaders.use();
+    mat4 skyView = mat4(mat3(view));
+    mat4 mv = skyView * mat4(1.0f);
+
+    SkyBoxShaders.setUniform("MVP", projection * mv);
+    SkyBox.render();
+
+    //draw cube
+
+    prog.use();
+    model = mat4(1.0f);
+    setMatrices();
 
     vec4 lightPos = vec4(10.0f*cos(angle), 10.0f, 10.0f*sin(angle), 1.0f);
     prog.setUniform("Spot.Position", vec3(view * lightPos));
