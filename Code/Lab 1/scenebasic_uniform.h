@@ -41,6 +41,7 @@ public:
     void render();
     void resize(int, int);
     void ProcessUserInput(int key,int action)override;
+    void Mouse_CallBack(double xpos, double ypos)override;
 };
 
 #endif // SCENEBASIC_UNIFORM_H

@@ -129,6 +129,9 @@ void SceneBasic_Uniform::setMatrices() {
 
     prog.setUniform("MVP", projection * mv);
 }
+void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
+
+}
 
 void SceneBasic_Uniform::render()
 {

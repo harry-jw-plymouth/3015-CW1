@@ -36,6 +36,7 @@ public:
     virtual void render() = 0;
 
     virtual void ProcessUserInput(int key, int action) {};
+    virtual void Mouse_CallBack(double xpos, double ypos) {};
 
     /**
       Called when screen is resized

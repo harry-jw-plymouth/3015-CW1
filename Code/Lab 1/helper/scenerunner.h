@@ -74,6 +74,18 @@ public:
         scene.initScene();
         scene.resize(fbw, fbh);
 
+        glfwSetWindowUserPointer(window, &scene);
+        glfwSetCursorPosCallback(window, 
+            [](GLFWwindow* w, double xpos, double ypos)
+            {
+                Scene* scene = static_cast<Scene*>(glfwGetWindowUserPointer(w));
+               
+                scene->Mouse_CallBack(xpos, ypos);
+            }
+        );
+            
+            
+
         // Enter the main loop
         mainLoop(window, scene);
 
