@@ -65,7 +65,8 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
     model = mat4(1.0f);
     angle = glm::radians(90.0f);
-    GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/cube/pisa-hdr/pisa");
+    GLuint SkyBoxTexture = Texture::loadCubeMap("../Cw1/media/texture/cube/pisa/Forest");
+  //  GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/Skybox/Forest/forest-skyboxes/Brudslojan");
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
 
