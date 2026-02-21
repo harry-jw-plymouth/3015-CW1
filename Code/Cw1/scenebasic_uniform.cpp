@@ -179,7 +179,7 @@ void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
     cameraLastYPos = (float)Ypos;
 
     //Moderates the change in position based on sensitivity value
-    const float sensitivity = 0.025f;
+    const float sensitivity = 0.05f;
     xOffset *= sensitivity;
     yOffset *= sensitivity;
 

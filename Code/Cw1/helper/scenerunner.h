@@ -75,6 +75,7 @@ public:
         scene.resize(fbw, fbh);
 
         glfwSetWindowUserPointer(window, &scene);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window, 
             [](GLFWwindow* w, double xpos, double ypos)
             {
