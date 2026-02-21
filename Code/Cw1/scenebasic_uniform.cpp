@@ -44,6 +44,8 @@ vec3 EyeCoordinates =  vec3(1.0f, 1.25f, 1.25f);
 vec3 CameraFront = vec3(0.0f, 0.0f, -1.0f);
 vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
 
+vec3 SwordPos;
+vec3 SwordCenter;
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
@@ -52,7 +54,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
-    SwordInStone = ObjMesh::load("../Cw1/media/sword_in_stone.obj");
+    SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj");
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::initScene()
@@ -91,6 +93,14 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("Spot.La", vec3(0.5f));
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
+
+   
+
+    model = glm::translate(model, EyeCoordinates + CameraFront * 2.0f);
+    model = glm::scale(model, vec3(5.0f));
+    model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    SwordPos = EyeCoordinates + CameraFront;
 
 
 }
@@ -213,7 +223,8 @@ void SceneBasic_Uniform::render()
     //draw sky
     model = mat4(1.0f);
 
-
+    glDepthMask(GL_FALSE);          // disable depth writes
+    glDepthFunc(GL_LEQUAL);
 
     SkyBoxShaders.use();
     mat4 skyView = mat4(mat3(view));
@@ -222,6 +233,8 @@ void SceneBasic_Uniform::render()
     SkyBoxShaders.setUniform("MVP", projection * mv);
     SkyBox.render();
 
+    glDepthMask(GL_TRUE);      
+    glDepthFunc(GL_LESS);           
     //draw cube
 
     prog.use();
@@ -239,15 +252,19 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Material.Shininess", 100.0f);
 
     model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
-    model = glm::scale(model, vec3(5.0f));
-    model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
- //   model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::translate(model, SwordPos);
+    
+    model = glm::translate(model, vec3(-0.0, -2.0f, 10.0f));
+  //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+  //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    
+   
+   // model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
    // SwordInStone->render();
-    cube.render();
+    SwordInStone->render();
 
-   // prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
+   // prog.setUniform("Material.Kd", vec3a(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));
     //prog.setUniform("Material.Ka", vec3(0.2f*0.3f, 0.55f* 0.3f, 0.9f* 0.3f));
     
