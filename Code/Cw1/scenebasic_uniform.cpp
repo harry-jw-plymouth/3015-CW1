@@ -54,7 +54,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
-    SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj");
+    SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj",true);
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::initScene()
@@ -81,8 +81,8 @@ void SceneBasic_Uniform::initScene()
     angle = 0.0f;
 
     prog.use();
-    prog.setUniform("Spot.L", vec3(1.0f));
-    prog.setUniform("Spot.La", vec3(0.05f));
+    prog.setUniform("Spot.L", vec3(0.99f));//light intensity
+    prog.setUniform("Spot.La", vec3(0.5f)); //light intensity outside spotlight
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
     GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
@@ -90,9 +90,9 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, texID);
 
    
-    prog.setUniform("Spot.La", vec3(0.5f));
-    prog.setUniform("Spot.Exponent", 50.0f);
-    prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
+    prog.setUniform("Spot.La", vec3(0.05f));  //light intensity outside spotlight
+    prog.setUniform("Spot.Exponent", 50.0f);  // higher value =darker around edges of light
+    prog.setUniform("Spot.Cutoff", glm::radians(15.0f)); //size of light (higher == bigger spotlight area) 
 
    
 
@@ -244,7 +244,13 @@ void SceneBasic_Uniform::render()
     vec4 lightPos = vec4(10.0f*cos(angle), 10.0f, 10.0f*sin(angle), 1.0f);
     prog.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    prog.setUniform("Spot.Direction", normalMatrix*vec3(-lightPos));
+
+//    vec3 swordPosView = vec3(view * vec4(SwordPos, 1.0f));
+ //   vec3 spotDirView = normalize(swordPosView - lightPosView);
+
+   // prog.setUniform("Spot.Direction", spotDirView);
+
+    prog.setUniform("Spot.Direction", normalize(vec3(view*vec4(SwordPos,1.0f))-vec3(view* lightPos)));
 
     prog.setUniform("Material.Kd", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
