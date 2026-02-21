@@ -24,6 +24,9 @@ uniform struct MaterialInfo{
     float Shininess;
 }Material;
 
+const int levels=10;
+const float scaleFactor=1.0/levels;
+
 //s=light LightDirection, position=EyeCoordinates
 vec3 BlinnphongSpot( vec3 position, vec3 n){
     vec3 diffuse=vec3(0), spec=vec3(0);
@@ -40,7 +43,7 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
         float sDotN=max(dot(s,n),0.0);
-        diffuse=Material.Kd*texColor*sDotN;
+        diffuse=Material.Kd*texColor*floor(levels* sDotN)*scaleFactor;
         if(sDotN>0.0){
             vec3 v=normalize(-position.xyz);
             vec3 h=normalize(v+s);

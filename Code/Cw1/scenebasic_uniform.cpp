@@ -52,7 +52,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
-    SwordInStone = ObjMesh::load("../lab 1/media/sword_in_stone.obj");
+    SwordInStone = ObjMesh::load("../Cw1/media/sword_in_stone.obj");
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::initScene()
@@ -65,7 +65,7 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
     model = mat4(1.0f);
     angle = glm::radians(90.0f);
-    GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../lab 1/media/texture/cube/pisa-hdr/pisa");
+    GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/cube/pisa-hdr/pisa");
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
 
@@ -123,7 +123,7 @@ void SceneBasic_Uniform::update(float t)
     deltaTime = t - tPrev;
     if (tPrev == 0.0f)deltaTime = 0.0f;
     tPrev = t;
-    angle += 0.25f * deltaTime;
+    angle += 0.125f * deltaTime;
     if (angle > glm::two_pi<float>())angle -= glm::two_pi<float>();
     
     view = glm::lookAt(EyeCoordinates, EyeCoordinates+CameraFront, CameraUp);
@@ -239,11 +239,12 @@ void SceneBasic_Uniform::render()
 
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
+    model = glm::scale(model, vec3(5.0f));
     model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
  //   model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
-    SwordInStone->render();
-    //cube.render();
+   // SwordInStone->render();
+    cube.render();
 
    // prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));
