@@ -53,6 +53,6 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
 }
 
 void main() {
-   // FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
-   FragColor=texture(Tex1,TexCoord);
+    FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+  // FragColor=texture(Tex1,TexCoord);
 }

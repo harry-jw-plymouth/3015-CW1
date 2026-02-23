@@ -45,6 +45,7 @@ vec3 CameraFront = vec3(0.0f, 0.0f, -1.0f);
 vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
 
 vec3 SwordPos;
+vec3 SwordOffset=vec3(2.0f,2.f,-15.0f);
 vec3 SwordCenter;
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
@@ -93,9 +94,9 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, texID);
 
    
-    prog.setUniform("Spot.La", vec3(0.05f));  //light intensity outside spotlight
-    prog.setUniform("Spot.Exponent", 50.0f);  // higher value =darker around edges of light
-    prog.setUniform("Spot.Cutoff", glm::radians(15.0f)); //size of light (higher == bigger spotlight area) 
+    prog.setUniform("Spot.La", vec3(0.5f));  //light intensity outside spotlight
+    prog.setUniform("Spot.Exponent", 8.0f);  // higher value =darker around edges of light
+    prog.setUniform("Spot.Cutoff", glm::radians(40.0f)); //size of light (higher == bigger spotlight area) 
 
    
 
@@ -264,7 +265,7 @@ void SceneBasic_Uniform::render()
     model = mat4(1.0f);
     model = glm::translate(model, SwordPos);
     
-    model = glm::translate(model, vec3(-0.0, -2.0f, 10.0f));
+    model = glm::translate(model, vec3(-0.0, -2.0f, 10.0f)+SwordOffset);
   //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
   //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
     
