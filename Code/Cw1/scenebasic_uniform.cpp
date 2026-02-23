@@ -48,6 +48,25 @@ vec3 SwordPos;
 vec3 SwordOffset=vec3(2.0f,2.f,-15.0f);
 vec3 SwordCenter;
 
+enum VAO_IDs { Triangles, Indices, Colours, Textures, NumVAOs = 2 };
+//VAOs
+GLuint VAOs[NumVAOs];
+
+//Buffer types
+enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
+//Buffer objects
+GLuint Buffers[NumBuffers];
+
+
+#define RENDER_DISTANCE 128 //Render width of map
+#define MAP_SIZE RENDER_DISTANCE * RENDER_DISTANCE //Size of map in x & z space
+GLfloat(*terrainVertices)[6];
+GLuint(*terrainIndices)[3];
+const int squaresRow = RENDER_DISTANCE - 1;
+const int trianglesPerSquare = 2;
+const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare;
+
+
 SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
     angle(0.0f),
@@ -57,6 +76,112 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj",true);
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
+}
+void SceneBasic_Uniform::SetUpTerrain() {
+    terrainVertices= new GLfloat[MAP_SIZE][6];
+    terrainIndices = new GLuint[trianglesGrid][3];
+
+    //Positions to start drawing from (centered around origin)
+    float drawingStartPosition = 4.0f;
+    float columnVerticesOffset = drawingStartPosition;
+    float rowVerticesOffset = drawingStartPosition;
+
+    int rowIndex = 0;
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        //Generation of x & z vertices for horizontal plane
+        terrainVertices[i][0] = columnVerticesOffset;
+        terrainVertices[i][1] = -1.0f;
+        terrainVertices[i][2] = rowVerticesOffset;
+
+        //Colour
+        terrainVertices[i][3] = 0.0f;
+        terrainVertices[i][4] = 0.75f;
+        terrainVertices[i][5] = 0.25f;
+
+        //Shifts x position across for next triangle along grid
+        columnVerticesOffset = columnVerticesOffset + -0.0625f;
+
+        //Indexing of each chunk within row
+        rowIndex++;
+        //True when all triangles of the current row have been generated
+        if (rowIndex == RENDER_DISTANCE)
+        {
+            //Resets for next row of triangles
+            rowIndex = 0;
+            //Resets x position for next row of triangles
+            columnVerticesOffset = drawingStartPosition;
+            //Shifts z position
+            rowVerticesOffset = rowVerticesOffset + -0.0625f;
+        }
+    }
+    
+
+    //Positions to start mapping indices from
+    int columnIndicesOffset = 0;
+    int rowIndicesOffset = 0;
+
+    //Generation of map indices in the form of chunks (1x1 right angle triangle squares)
+    rowIndex = 0;
+    for (int i = 0; i < trianglesGrid - 1; i += 2)
+    {
+        terrainIndices[i][0] = columnIndicesOffset + rowIndicesOffset; //top left
+        terrainIndices[i][2] = RENDER_DISTANCE + columnIndicesOffset + rowIndicesOffset; //bottom left
+        terrainIndices[i][1] = 1 + columnIndicesOffset + rowIndicesOffset; //top right
+
+        terrainIndices[i + 1][0] = 1 + columnIndicesOffset + rowIndicesOffset; //top right
+        terrainIndices[i + 1][2] = RENDER_DISTANCE + columnIndicesOffset + rowIndicesOffset; //bottom left
+        terrainIndices[i + 1][1] = 1 + RENDER_DISTANCE + columnIndicesOffset + rowIndicesOffset; //bottom right
+
+        //Shifts x position across for next chunk along grid
+        columnIndicesOffset = columnIndicesOffset + 1;
+
+        //Indexing of each chunk within row
+        rowIndex++;
+
+        //True when all chunks of the current row have been generated
+        if (rowIndex == squaresRow)
+        {
+            //Resets for next row of chunks
+            rowIndex = 0;
+            //Resets x position for next row of chunks
+            columnIndicesOffset = 0;
+            //Shifts z position
+            rowIndicesOffset = rowIndicesOffset + RENDER_DISTANCE;
+        }
+    }
+    //Sets index of VAO
+    glGenVertexArrays(NumVAOs, VAOs);
+    //Binds VAO to a buffer
+    glBindVertexArray(VAOs[0]);
+    //Sets indexes of all required buffer objects
+    glGenBuffers(NumBuffers, Buffers);
+
+    //Binds vertex object to array buffer
+    glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
+    //Allocates buffer memory for the vertices of the 'Triangles' buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * MAP_SIZE * 6, terrainVertices, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(terrainVertices), terrainVertices, GL_STATIC_DRAW);
+
+    //Binding & allocation for indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(terrainIndices), terrainIndices, GL_STATIC_DRAW);
+
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * trianglesGrid * 3, terrainIndices, GL_STATIC_DRAW);
+
+    //Allocation & indexing of vertex attribute memory for vertex shader
+    //Positions
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //Colours
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    //Unbinding
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 void SceneBasic_Uniform::initScene()
 {
@@ -105,6 +230,8 @@ void SceneBasic_Uniform::initScene()
     model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
 
     SwordPos = EyeCoordinates + CameraFront;
+
+    SetUpTerrain();
 
 
 }
@@ -223,6 +350,9 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
+
+    glBindVertexArray(VAOs[0]);
+    glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
 
     //draw sky
     model = mat4(1.0f);

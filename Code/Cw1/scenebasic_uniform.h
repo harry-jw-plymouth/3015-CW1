@@ -44,6 +44,7 @@ private:
 public:
     SceneBasic_Uniform();
 
+    void SetUpTerrain();
     void setMatrices();
     void initScene();
     void update( float t );
