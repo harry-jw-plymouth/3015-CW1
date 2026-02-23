@@ -76,16 +76,19 @@ void SceneBasic_Uniform::initScene()
     view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
 
     prog.use();
+    prog.setUniform("Tex1", 0);
 
     projection = mat4(1.0f);
     angle = 0.0f;
 
     prog.use();
+    prog.setUniform("Tex1", 0);
     prog.setUniform("Spot.L", vec3(0.99f));//light intensity
     prog.setUniform("Spot.La", vec3(0.5f)); //light intensity outside spotlight
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
-    GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
+   // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
+    GLuint texID = Texture::loadTexture("media/texture/SwordTexture.png");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texID);
 
@@ -238,6 +241,7 @@ void SceneBasic_Uniform::render()
     //draw cube
 
     prog.use();
+    prog.setUniform("Tex1", 0);
     model = mat4(1.0f);
     setMatrices();
 

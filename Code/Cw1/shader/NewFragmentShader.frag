@@ -2,10 +2,9 @@
 
 in vec3 Position;
 in vec3 Normal;
-
 in vec2 TexCoord;
 
-layout (binding=0) uniform sampler2D Tex1;
+layout (binding=1) uniform sampler2D Tex1;
 layout (location = 0)out vec4 FragColor;
 
 uniform struct SpotLightInfo{
@@ -24,7 +23,7 @@ uniform struct MaterialInfo{
     float Shininess;
 }Material;
 
-const int levels=10;
+const int levels=5;
 const float scaleFactor=1.0/levels;
 
 //s=light LightDirection, position=EyeCoordinates
@@ -38,7 +37,7 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
 
     float cosAng=dot(-s, normalize(Spot.Direction));
     float angle=acos(cosAng);
-    float spotScale;
+    float spotScale=0.0;
 
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
@@ -54,5 +53,6 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
 }
 
 void main() {
-    FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+   // FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+   FragColor=texture(Tex1,TexCoord);
 }
