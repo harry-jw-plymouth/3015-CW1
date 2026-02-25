@@ -3,21 +3,37 @@
 layout (location = 0) in vec3 VertexPosition;
 layout (location = 1) in vec3 VertexNormal;
 layout (location = 2) in vec2 VertexTexCoord;
+layout (location =3) in vec4 VertexTangent'
 
-out vec2 TexCoord;
+
 out vec3 Position;
 out vec3 Normal;
+out vec3 ViewDir;
+out vec3 LightDir;
+out vec2 TexCoord;
 
-uniform mat4 ProjectionMatrix;
+
 uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
+uniform mat4 ProjectionMatrix;
 uniform mat4 MVP;
 
 void main()
 {
-    TexCoord=VertexTexCoord;
-    Normal=normalize(NormalMatrix*VertexNormal);
+     Normal=normalize(NormalMatrix*VertexNormal);
+     vec3 tang=normalize(NormalMatrix*vec3(VertexTangent));
+
+     vec3 binormal=normalize(cross(norm,tang))*VertexTangent.w; 
     Position=(ModelViewMatrix*vec4(VertexPosition,1.0)).xyz; 
-    
+
+    mat3 toObjectLocal=mat3(
+        tang.x,binormal.x,norm.x,
+        tang.y,binormal.y,norm.y,
+        tang.z,binormal.z,norm.z
+    );
+    LightDir=toObjectLocal*(Light.position.xyz-position);
+    ViewDir=toObjectLocal*normalize(-Position);
+   
+    TexCoord=VertexTexCoord;
     gl_Position=MVP*vec4(VertexPosition,1.0);
 }
