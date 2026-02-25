@@ -28,6 +28,7 @@ private:
   //  float angle;
 
     std::unique_ptr<ObjMesh>SwordInStone;
+    std::unique_ptr<ObjMesh>Tree;
 
     Cube cube;
 

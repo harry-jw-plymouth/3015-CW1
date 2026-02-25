@@ -44,6 +44,8 @@ vec3 EyeCoordinates =  vec3(1.0f, 1.25f, 1.25f);
 vec3 CameraFront = vec3(0.0f, 0.0f, -1.0f);
 vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
 
+vec3 Tree1Pos;
+
 vec3 SwordPos;
 vec3 SwordOffset=vec3(2.0f,2.f,-15.0f);
 vec3 SwordCenter;
@@ -75,6 +77,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj",true);
+    Tree = ObjMesh::load("../Cw1/media/Tree.obj");
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::SetUpTerrain() {
@@ -237,6 +240,8 @@ void SceneBasic_Uniform::initScene()
     model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
 
     SwordPos = EyeCoordinates + CameraFront;
+
+    Tree1Pos = EyeCoordinates + CameraFront;
 
     SetUpTerrain();
     TerrainShaders.use();
@@ -423,6 +428,8 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
 
+    
+
 //    vec3 swordPosView = vec3(view * vec4(SwordPos, 1.0f));
  //   vec3 spotDirView = normalize(swordPosView - lightPosView);
 
@@ -436,17 +443,31 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Material.Shininess", 100.0f);
 
     model = mat4(1.0f);
+    
     model = glm::translate(model, SwordPos);
     
     model = glm::translate(model, vec3(-0.0, -2.0f, 10.0f)+SwordOffset);
+    
   //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
   //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
     
    
-   // model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
    // SwordInStone->render();
     SwordInStone->render();
+    // draw other objects
+     //tree
+     model = mat4(1.0f);
+     
+     model = glm::translate(model, Tree1Pos);
+     model = glm::translate(model,  vec3(0.8, -3.0f, 9.5f) + SwordOffset);
+     model = glm::scale(model, vec3(1.25f , 1.25f, 1.25f));
+     model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
+     model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
+
+     setMatrices();
+    Tree->render();
 
    // prog.setUniform("Material.Kd", vec3a(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));
