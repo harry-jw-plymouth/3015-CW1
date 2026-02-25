@@ -65,7 +65,7 @@ GLuint(*terrainIndices)[3];
 const int squaresRow = RENDER_DISTANCE - 1;
 const int trianglesPerSquare = 2;
 const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare;
-
+float TerrainSize;
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
@@ -82,6 +82,8 @@ void SceneBasic_Uniform::SetUpTerrain() {
     terrainIndices = new GLuint[trianglesGrid][3];
    // float SpaceBetween = 0.0625f;
     float SpaceBetween = 0.1f;
+
+    TerrainSize = (RENDER_DISTANCE - 1) * SpaceBetween;
 
     //Positions to start drawing from (centered around origin)
     float drawingStartPosition = 10.0f;
@@ -238,6 +240,10 @@ void SceneBasic_Uniform::initScene()
 
     SetUpTerrain();
     TerrainShaders.use();
+    TerrainShaders.setUniform("TerrainStart", glm::vec2(10.0f, 10.0f));
+    TerrainShaders.setUniform("TerrainSize", TerrainSize);
+    // TerrainShaders.setUniform("mvpIn", projection * mv);
+
     GroundTexture = Texture::loadTexture("media/texture/SkyBoxBottom.png");
     // GroundTexture = Texture::loadTexture("media/texture/Ground.png");
     glActiveTexture(GL_TEXTURE1);
@@ -378,6 +384,9 @@ void SceneBasic_Uniform::render()
 
     mat4 mv = view * glm::mat4(1.0f);
     TerrainShaders.setUniform("mvpIn", projection * mv);
+    TerrainShaders.setUniform("TerrainStart", glm::vec2(10.0f, 10.0f));
+    TerrainShaders.setUniform("TerrainSize", TerrainSize);
+    // TerrainShaders.setUniform("mvpIn", projection * mv);
 
     glBindVertexArray(VAOs[0]);
     glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);

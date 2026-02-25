@@ -6,6 +6,8 @@ layout (location = 1) in vec3 colourVertex;
 
 //Model-View-Projection Matrix
 uniform mat4 mvpIn;
+uniform vec2 TerrainStart;
+uniform float TerrainSize;
 
 //Colour to send
 out vec2 TexCoord;
@@ -15,5 +17,5 @@ void main()
     //Transformation applied to vertices
     gl_Position = mvpIn * vec4(position.x, position.y, position.z, 1.0);
     //Sending texture coordinates to next stage
-    TexCoord=position.xz;
+    TexCoord=(position.xz-TerrainStart)/TerrainSize;
 }
