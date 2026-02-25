@@ -58,7 +58,7 @@ enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
 GLuint Buffers[NumBuffers];
 
 
-#define RENDER_DISTANCE 128 //Render width of map
+#define RENDER_DISTANCE 256 //Render width of map
 #define MAP_SIZE RENDER_DISTANCE * RENDER_DISTANCE //Size of map in x & z space
 GLfloat(*terrainVertices)[6];
 GLuint(*terrainIndices)[3];
@@ -80,9 +80,13 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 void SceneBasic_Uniform::SetUpTerrain() {
     terrainVertices= new GLfloat[MAP_SIZE][6];
     terrainIndices = new GLuint[trianglesGrid][3];
+   // float SpaceBetween = 0.0625f;
+    float SpaceBetween = 0.1f;
 
     //Positions to start drawing from (centered around origin)
-    float drawingStartPosition = 4.0f;
+    float drawingStartPosition = 10.0f;
+    //float columnVerticesOffset = (EyeCoordinates + CameraFront).x + (((RENDER_DISTANCE - 1) * SpaceBetween) / 2);
+    //float rowVerticesOffset= (EyeCoordinates + CameraFront).z + (((RENDER_DISTANCE - 1) * SpaceBetween) / 2);
     float columnVerticesOffset = drawingStartPosition;
     float rowVerticesOffset = drawingStartPosition;
 
@@ -91,7 +95,7 @@ void SceneBasic_Uniform::SetUpTerrain() {
     {
         //Generation of x & z vertices for horizontal plane
         terrainVertices[i][0] = columnVerticesOffset;
-        terrainVertices[i][1] = -1.0f;
+        terrainVertices[i][1] = 0.25f;
         terrainVertices[i][2] = rowVerticesOffset;
 
         //Colour
@@ -100,7 +104,7 @@ void SceneBasic_Uniform::SetUpTerrain() {
         terrainVertices[i][5] = 0.25f;
 
         //Shifts x position across for next triangle along grid
-        columnVerticesOffset = columnVerticesOffset + -0.0625f;
+        columnVerticesOffset = columnVerticesOffset + -SpaceBetween;
 
         //Indexing of each chunk within row
         rowIndex++;
@@ -112,7 +116,7 @@ void SceneBasic_Uniform::SetUpTerrain() {
             //Resets x position for next row of triangles
             columnVerticesOffset = drawingStartPosition;
             //Shifts z position
-            rowVerticesOffset = rowVerticesOffset + -0.0625f;
+            rowVerticesOffset = rowVerticesOffset + -SpaceBetween;
         }
     }
     
@@ -214,9 +218,10 @@ void SceneBasic_Uniform::initScene()
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
    // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
-    GLuint texID = Texture::loadTexture("media/texture/SwordTexture.png");
+   // GLuint texID = 
+    SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texID);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
 
    
     prog.setUniform("Spot.La", vec3(0.5f));  //light intensity outside spotlight
@@ -232,6 +237,13 @@ void SceneBasic_Uniform::initScene()
     SwordPos = EyeCoordinates + CameraFront;
 
     SetUpTerrain();
+    TerrainShaders.use();
+    GroundTexture = Texture::loadTexture("media/texture/SkyBoxBottom.png");
+    // GroundTexture = Texture::loadTexture("media/texture/Ground.png");
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, GroundTexture);
+    TerrainShaders.setUniform("GroundTexture", 0);
+    
 
 
 }
@@ -247,7 +259,13 @@ void SceneBasic_Uniform::compile()
         SkyBoxShaders.compileShader("shader/SkyBoxVertexShader.vert");
         SkyBoxShaders.compileShader("shader/SkyBoxFragmentShader.frag");
         SkyBoxShaders.link();
-        SkyBoxShaders.use();
+      //  SkyBoxShaders.use();
+
+        TerrainShaders.compileShader("shader/Terrainfragmentshader.frag");
+        TerrainShaders.compileShader("shader/TerrainVertexshader.vert");
+        TerrainShaders.link();
+
+
     }
     catch (GLSLProgramException &e) {
         cerr << e.what() << endl;
@@ -351,8 +369,21 @@ void SceneBasic_Uniform::render()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
+
+    //draw terrain
+    TerrainShaders.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, GroundTexture);
+    TerrainShaders.setUniform("GroundTexture", 0);
+
+    mat4 mv = view * glm::mat4(1.0f);
+    TerrainShaders.setUniform("mvpIn", projection * mv);
+
     glBindVertexArray(VAOs[0]);
     glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
+
+ 
+
 
     //draw sky
     model = mat4(1.0f);
@@ -362,7 +393,7 @@ void SceneBasic_Uniform::render()
 
     SkyBoxShaders.use();
     mat4 skyView = mat4(mat3(view));
-    mat4 mv = skyView * mat4(1.0f);
+    mv = skyView * mat4(1.0f);
 
     SkyBoxShaders.setUniform("MVP", projection * mv);
     SkyBox.render();
@@ -372,6 +403,9 @@ void SceneBasic_Uniform::render()
     //draw cube
 
     prog.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
+  //  prog .setUniform("Tex1", 0);
     prog.setUniform("Tex1", 0);
     model = mat4(1.0f);
     setMatrices();

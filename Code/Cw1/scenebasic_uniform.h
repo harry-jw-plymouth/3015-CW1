@@ -24,6 +24,7 @@ private:
     GLSLProgram prog;
 
     GLSLProgram SkyBoxShaders;
+    GLSLProgram TerrainShaders;
   //  float angle;
 
     std::unique_ptr<ObjMesh>SwordInStone;
@@ -33,6 +34,8 @@ private:
     float angle;
     float tPrev;
     float rotSpeed;
+    GLuint SwordTexture;
+    GLuint GroundTexture;
 
 
     SkyBox SkyBox;
