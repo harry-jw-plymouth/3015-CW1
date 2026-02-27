@@ -22,11 +22,15 @@ class SceneBasic_Uniform : public Scene
 private:
   //  GLuint vaoHandle;
     GLSLProgram prog;
-    GLSLProgram SkyBoxProg;
+
+    GLSLProgram SkyBoxShaders;
+    GLSLProgram TerrainShaders;
   //  float angle;
 
     Cube cube;
-    SkyBox sky;
+    SkyBox SkyBox;
+    GLuint SwordTexture;
+    GLuint GroundTexture;
 
     float angle;
     float tPrev;
@@ -40,11 +44,16 @@ private:
 public:
     SceneBasic_Uniform();
 
+    void DrawSkyBox();
+    void DrawTerrain();
+    void SetUpTerrain();
     void setMatrices();
     void initScene();
     void update( float t );
     void render();
     void resize(int, int);
+    void ProcessUserInput(int key, int action)override;
+    void Mouse_CallBack(double xpos, double ypos)override;
 };
 
 #endif // SCENEBASIC_UNIFORM_H
