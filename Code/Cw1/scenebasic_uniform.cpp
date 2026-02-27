@@ -79,7 +79,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj",true);
-    Tree = ObjMesh::load("../Cw1/media/Tree/Tree.obj");
+    Tree = ObjMesh::load("../Cw1/media/Tree.obj");
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::SetUpTerrain() {
@@ -238,13 +238,9 @@ vec3 lightTarget = EyeCoordinates + vec3(0.0f, 0.0f, -10.0f);
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
    // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
    // GLuint texID = 
-    SwordTextureNormalMap = Texture::loadTexture("media/texture/sword_material_normal_map.png");
     SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, SwordTextureNormalMap);
 
    
    
@@ -466,6 +462,7 @@ void SceneBasic_Uniform::render()
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
+<<<<<<< HEAD
     prog.setUniform("StandardTexture", 0);
 
     glActiveTexture(GL_TEXTURE1);
@@ -474,6 +471,10 @@ void SceneBasic_Uniform::render()
 
 
     //set pos of sword mode;
+=======
+  //  prog .setUniform("Tex1", 0);
+    prog.setUniform("Tex1", 0);
+>>>>>>> parent of b35245e (Added texture for normal mapping sword)
     model = mat4(1.0f);
     setMatrices();    
     model = glm::translate(model, SwordPos);   
@@ -494,12 +495,17 @@ void SceneBasic_Uniform::render()
     // model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
     // model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
 
+<<<<<<< HEAD
 //     setMatrices();
 
  //    glActiveTexture(GL_TEXTURE0);
    //  prog.setUniform("Tex1", 0);
   //  Tree->render();
    // setMatrices();
+=======
+     setMatrices();
+    Tree->render();
+>>>>>>> parent of b35245e (Added texture for normal mapping sword)
 
    // prog.setUniform("Material.Kd", vec3a(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));

@@ -36,9 +36,7 @@ private:
     float tPrev;
     float rotSpeed;
     GLuint SwordTexture;
-    GLuint SwordTextureNormalMap;
     GLuint GroundTexture;
-
 
 
     SkyBox SkyBox;
