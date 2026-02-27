@@ -50,6 +50,8 @@ private:
 public:
     SceneBasic_Uniform();
 
+    void DrawSkyBox();
+    void DrawTerrain();
     void SetUpTerrain();
     void setMatrices();
     void initScene();

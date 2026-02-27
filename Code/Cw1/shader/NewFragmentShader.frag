@@ -4,7 +4,7 @@ in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 in vec3 LightDir;
-in vece ViewDir;
+in vec3 ViewDir;
 
 layout (binding=0) uniform sampler2D StandardTexture;
 layout(binding=1)uniform sampler2D NormalMapTex;

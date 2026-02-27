@@ -69,6 +69,8 @@ const int trianglesPerSquare = 2;
 const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare;
 float TerrainSize;
 
+mat4 mv;
+
 SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
     angle(0.0f),
@@ -217,9 +219,9 @@ void SceneBasic_Uniform::initScene()
     angle = 0.0f;
 
     prog.use();
-    prog.setUniform("Tex1", 0);
-    prog.setUniform("Spot.L", vec3(0.99f));//light intensity
-    prog.setUniform("Spot.La", vec3(0.5f)); //light intensity outside spotlight
+    //prog.setUniform("Tex1", 0);
+    prog.setUniform("Spot.L", vec3(1.f));//light intensity
+    prog.setUniform("Spot.La", vec3(0.05f)); //light intensity outside spotlight
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
    // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
@@ -235,7 +237,7 @@ void SceneBasic_Uniform::initScene()
    
     prog.setUniform("Spot.La", vec3(0.5f));  //light intensity outside spotlight
     prog.setUniform("Spot.Exponent", 8.0f);  // higher value =darker around edges of light
-    prog.setUniform("Spot.Cutoff", glm::radians(40.0f)); //size of light (higher == bigger spotlight area) 
+    prog.setUniform("Spot.Cutoff", glm::radians(15.0f)); //size of light (higher == bigger spotlight area) 
 
    
 
@@ -378,13 +380,7 @@ void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
     direction.z = sin(radians(cameraYaw)) * cos(radians(cameraPitch));
     CameraFront = normalize(direction);
 }
-
-void SceneBasic_Uniform::render()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-
+void SceneBasic_Uniform::DrawTerrain() {
     //draw terrain
     TerrainShaders.use();
     glActiveTexture(GL_TEXTURE0);
@@ -400,9 +396,9 @@ void SceneBasic_Uniform::render()
     glBindVertexArray(VAOs[0]);
     glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
 
- 
+}
 
-
+void SceneBasic_Uniform::DrawSkyBox() {
     //draw sky
     model = mat4(1.0f);
 
@@ -416,8 +412,19 @@ void SceneBasic_Uniform::render()
     SkyBoxShaders.setUniform("MVP", projection * mv);
     SkyBox.render();
 
-    glDepthMask(GL_TRUE);      
-    glDepthFunc(GL_LESS);           
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+}
+
+void SceneBasic_Uniform::render()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    DrawTerrain();
+
+    DrawSkyBox();
+            
     //draw cube
 
     prog.use();
