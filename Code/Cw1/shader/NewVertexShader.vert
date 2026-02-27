@@ -12,14 +12,11 @@ out vec3 ViewDir;
 out vec3 LightDir;
 out vec2 TexCoord;
 
-uniform struct SpotLightInfo{
-    vec3 Position;
-    vec3 La;
-    vec3 L;
-    vec3 Direction;
-    float Exponent;
-    float Cutoff;
-}Spot;
+//uniform struct LightInfo{
+  //  vec4 Position;
+ //   vec3 La;
+   // vec3 L;
+//}Light;
 
 
 
@@ -30,20 +27,21 @@ uniform mat4 MVP;
 
 void main()
 {
-     Normal=normalize(NormalMatrix*VertexNormal);
-     vec3 tang=normalize(NormalMatrix*vec3(VertexTangent));
-
-     vec3 binormal=normalize(cross(Normal,tang))*VertexTangent.w; 
+    // Normal=normalize(NormalMatrix*VertexNormal);
+     //vec3 tang=normalize(NormalMatrix*vec3(VertexTangent));
+   // vec3 binormal=normalize(cross(Normal,tang))*VertexTangent.w; 
+    TexCoord=VertexTexCoord;
+    Normal=normalize(NormalMatrix*VertexNormal);
     Position=(ModelViewMatrix*vec4(VertexPosition,1.0)).xyz; 
 
-    mat3 toObjectLocal=mat3(
-        tang.x,binormal.x,Normal.x,
-        tang.y,binormal.y,Normal.y,
-        tang.z,binormal.z,Normal.z
-    );
-    LightDir=toObjectLocal*(Spot.Position.xyz-Position);
-    ViewDir=toObjectLocal*normalize(-Position);
+   // mat3 toObjectLocal=mat3(
+  //      tang.x,binormal.x,Normal.x,
+  //      tang.y,binormal.y,Normal.y,
+  //      tang.z,binormal.z,Normal.z
+    //);
+    //LightDir=toObjectLocal*(Light.Position.xyz-Position);
+    //ViewDir=toObjectLocal*normalize(-Position);
    
-    TexCoord=VertexTexCoord;
+    //TexCoord=VertexTexCoord;
     gl_Position=MVP*vec4(VertexPosition,1.0);
 }

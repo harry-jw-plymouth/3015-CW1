@@ -34,15 +34,15 @@ const int levels=5;
 const float scaleFactor=1.0/levels;
 
 //s=light LightDirection, position=EyeCoordinates
-vec3 BlinnphongSpot(vec3 position,  vec3 n){
+vec3 BlinnphongSpot(  vec3 n){
     vec3 diffuse=vec3(0), spec=vec3(0);
     vec3 texColor=texture(StandardTexture,TexCoord).rgb;
     
-    vec3 ambient=Spot.La*Material.Ka*texColor;
-   //vec3 ambient=Spot.La*texColor;
+   // vec3 ambient=Spot.La*Material.Ka*texColor;
+   vec3 ambient=Spot.La*texColor;
 
-    vec3 s=normalize(Spot.Position-position);
-    //vec3 s=normalize(LightDir);
+    //vec3 s=normalize(Spot.Position-position);
+    vec3 s=normalize(LightDir);
 
     float cosAng=dot(-s, normalize(Spot.Direction));
     float angle=acos(cosAng);
@@ -53,8 +53,8 @@ vec3 BlinnphongSpot(vec3 position,  vec3 n){
         float sDotN=max(dot(s,n),0.0);
         diffuse=Material.Kd*texColor*floor(levels* sDotN)*scaleFactor;
         if(sDotN>0.0){
-            vec3 v=normalize(-position.xyz);
-            //vec3 v=normalize(ViewDir);
+            //vec3 v=normalize(-position.xyz);
+            vec3 v=normalize(ViewDir);
             vec3 h=normalize(v+s);
             spec=Material.Ks*pow(max(dot(h,n),0.0),Material.Shininess);
         }
@@ -67,9 +67,6 @@ void main() {
     vec3 Norm=texture(NormalMapTex,TexCoord).xyz;
     Norm.xy=2.0*Norm.xy-1.0;
 
-    FragColor=vec4(BlinnphongSpot(Position,normalize(Norm)),1.0);
-
-
-    //FragColor=vec4(BlinnphongSpot(normalize(Norm)),1.0);
+    FragColor=vec4(BlinnphongSpot(normalize(Norm)),1.0);
   // FragColor=texture(Tex1,TexCoord);
 }

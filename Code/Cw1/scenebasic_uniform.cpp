@@ -213,15 +213,27 @@ void SceneBasic_Uniform::initScene()
     view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
 
     prog.use();
+    vec4 lightPos = vec4(EyeCoordinates + vec3(0.0f, 5.0f, -8.0f), 1.0f);
+vec3 lightTarget = EyeCoordinates + vec3(0.0f, 0.0f, -10.0f);
+
+    mat4 fixedView = glm::lookAt(EyeCoordinates, EyeCoordinates + CameraFront, CameraUp);
+
+    
+    prog.setUniform("Spot.Position", vec3(fixedView * lightPos));
+    prog.setUniform("Spot.Direction", glm::normalize(vec3(fixedView * vec4(lightTarget, 1.0f)) - vec3(fixedView * lightPos)));
+    prog.setUniform("Spot.L", vec3(0.99f));//light intensity
+    prog.setUniform("Spot.La", vec3(1.0f)); //light intensity outside spotlight
+    prog.setUniform("Spot.Cutoff", glm::radians(89.0f));//size of light (higher == bigger spotlight area) 
+    prog.setUniform("Spot.Exponent", 50.0f);  // higher value =darker around edges of light
+
     prog.setUniform("Tex1", 0);
 
     projection = mat4(1.0f);
     angle = 0.0f;
 
     prog.use();
-    //prog.setUniform("Tex1", 0);
-    prog.setUniform("Spot.L", vec3(1.f));//light intensity
-    prog.setUniform("Spot.La", vec3(0.05f)); //light intensity outside spotlight
+    prog.setUniform("Tex1", 0);
+    
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
    // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
@@ -235,9 +247,7 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, SwordTextureNormalMap);
 
    
-    prog.setUniform("Spot.La", vec3(0.5f));  //light intensity outside spotlight
-    prog.setUniform("Spot.Exponent", 8.0f);  // higher value =darker around edges of light
-    prog.setUniform("Spot.Cutoff", glm::radians(15.0f)); //size of light (higher == bigger spotlight area) 
+   
 
    
 
@@ -425,9 +435,35 @@ void SceneBasic_Uniform::render()
 
     DrawSkyBox();
             
-    //draw cube
-
+    //Ensure right shaders are active
     prog.use();
+    //set spot light position
+    vec3  swordWorldPos = SwordPos + vec3(0.0f, -2.0f, 10.0f) + SwordOffset;
+   // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
+    vec4 lightPos = vec4(swordWorldPos + vec3(0.0f, 5.0f, 0.0f), 1.0f);
+  //  prog.setUniform("Spot.Position", vec3(view * lightPos));
+  //  prog.setUniform("Spot.Direction", glm::normalize(vec3(view*vec4(swordWorldPos,1.0f))-   vec3(view * lightPos)));
+
+    // Set spot Light direction
+    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+ //  prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+   // prog.setUniform("Spot.L", vec3(5.0f));
+  //  prog.setUniform("Spot.La", vec3(0.8f));
+    
+   // prog.setUniform("Spot.Cutoff", glm::radians(89.0f));
+  //  prog.setUniform("Spot.Exponent", 1.0f);
+    //prog.setUniform("Spot.Direction", normalize(vec3(view * vec4(SwordPos, 1.0f)) - vec3(view * lightPos)));
+   // prog.setUniform("Light.Position", vec3( lightPos));
+
+    // Set light position
+   // prog.setUniform("Spot.Position", vec3(lightPos)) ;
+
+    //Set material values
+    prog.setUniform("Material.Kd", vec3(.2f, 0.55f, 1.0f));
+    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
+    prog.setUniform("Material.Shininess", 100.0f);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
     prog.setUniform("StandardTexture", 0);
@@ -436,56 +472,34 @@ void SceneBasic_Uniform::render()
     glBindTexture(GL_TEXTURE_2D, SwordTextureNormalMap);
     prog.setUniform("NormalMapTex", 1);
 
+
+    //set pos of sword mode;
     model = mat4(1.0f);
-    setMatrices();
-
-    vec4 lightPos = vec4(10.0f*cos(angle), 10.0f, 10.0f*sin(angle), 1.0f);
-    prog.setUniform("Spot.Position", vec3(view * lightPos));
-    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-
-    
-
-//    vec3 swordPosView = vec3(view * vec4(SwordPos, 1.0f));
- //   vec3 spotDirView = normalize(swordPosView - lightPosView);
-
-   // prog.setUniform("Spot.Direction", spotDirView);
-
-    prog.setUniform("Spot.Direction", normalize(vec3(view*vec4(SwordPos,1.0f))-vec3(view* lightPos)));
-
-    prog.setUniform("Material.Kd", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("Material.Ka", vec3(0.2f*0.3f, 0.55f*0.3f, 0.9f*0.3f));  
-    prog.setUniform("Material.Shininess", 100.0f);
-
-    model = mat4(1.0f);
-    
-    model = glm::translate(model, SwordPos);
-    
+    setMatrices();    
+    model = glm::translate(model, SwordPos);   
     model = glm::translate(model, vec3(-0.0, -2.0f, 10.0f)+SwordOffset);
-    
-  //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-  //  model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-    
-   
     model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
-   // SwordInStone->render();
+    //render sword
     SwordInStone->render();
+
     // draw other objects
+    //    
      //tree
-     model = mat4(1.0f);
+     //model = mat4(1.0f);
      
-     model = glm::translate(model, Tree1Pos);
-     model = glm::translate(model,  vec3(0.8, -3.0f, 9.5f) + SwordOffset);
-     model = glm::scale(model, vec3(1.25f , 1.25f, 1.25f));
-     model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
-     model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
+    // model = glm::translate(model, Tree1Pos);
+    // model = glm::translate(model,  vec3(0.8, -3.0f, 9.5f) + SwordOffset);
+    // model = glm::scale(model, vec3(1.25f , 1.25f, 1.25f));
+    // model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
+    // model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
 
-     setMatrices();
+//     setMatrices();
 
-     glActiveTexture(GL_TEXTURE0);
-     prog.setUniform("Tex1", 0);
-    Tree->render();
+ //    glActiveTexture(GL_TEXTURE0);
+   //  prog.setUniform("Tex1", 0);
+  //  Tree->render();
+   // setMatrices();
 
    // prog.setUniform("Material.Kd", vec3a(0.2f, 0.55f, 0.9f));
    /// prog.setUniform("Material.Ks", vec3(0.95f ,  0.95f, 0.95f));
@@ -506,7 +520,7 @@ void SceneBasic_Uniform::render()
 //    prog.setUniform("Material.Shininess", 180.0f);
 
   //  model = mat4(1.0f);
-    setMatrices();
+   
     //plane.render();
 
 
