@@ -32,6 +32,9 @@ private:
     GLuint SwordTexture;
     GLuint GroundTexture;
 
+    std::unique_ptr<ObjMesh>SwordInStone;
+    std::unique_ptr<ObjMesh>Tree;
+
     float angle;
     float tPrev;
     float rotSpeed;
@@ -43,7 +46,8 @@ private:
  //   std::unique_ptr<ObjMesh>mesh;
 public:
     SceneBasic_Uniform();
-
+    void DrawSword();
+    void DrawTrees();
     void DrawSkyBox();
     void DrawTerrain();
     void SetUpTerrain();

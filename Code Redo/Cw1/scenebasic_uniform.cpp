@@ -79,6 +79,8 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
+    SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj", true);
+    Tree = ObjMesh::load("../Cw1/media/Tree.obj");
     ogre = ObjMesh::load("../Cw1/media/bs_ears.obj", false, true);
    /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
@@ -297,19 +299,21 @@ void SceneBasic_Uniform::ProcessUserInput(int key, int action) {
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             if (key == GLFW_KEY_W) {
                 EyeCoordinates += movementSpeed * CameraFront;
-                   std::cout << "Key: " << key << std::endl;
+                 //  std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_A) {
                 EyeCoordinates -= normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-                 std::cout << "Key: " << key << std::endl;
+               //  std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_S) {
                 EyeCoordinates -= movementSpeed * CameraFront;
-                  std::cout << "Key: " << key << std::endl;
+               //   std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_D) {
                 EyeCoordinates += normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-                  std::cout << "Key: " << key << std::endl;
+                
+                
+                //std::cout << "Key: " << key << std::endl;
             }
         }
     }
@@ -394,38 +398,65 @@ void SceneBasic_Uniform::DrawSkyBox() {
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 }
+void SceneBasic_Uniform::DrawSword() {
+    prog.use();
+    model = mat4(1.0f);
+    setMatrices();
+    vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
+    prog.setUniform("Spot.Position", vec3(view * lightPos));
+    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+    prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
 
+    prog.setUniform("Light.Position", view * vec4(10.0f * cos(angle), 1.0f, 10.0f * sin(angle), 1.0f));
+
+    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.09f));
+    prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
+    prog.setUniform("Material.Shininess", 100.0f);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
+
+    model = mat4(1.0f);
+    SwordPos = vec3(0.0f, 1.3f, 0.0f);
+    model = glm::translate(model, SwordPos);
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    SwordInStone->render();
+    ogre->render();
+    setMatrices();
+
+}
+void SceneBasic_Uniform::DrawTrees() {
+    model = mat4(1.0f);
+
+     //model = glm::translate(model, Tree1Pos);
+     //model = glm::translate(model,  vec3(0.8, -3.0f, 9.5f) + SwordOffset);
+     model = glm::translate(model, vec3(0.0f, -2.0f, 0.0f) );
+     model = glm::scale(model, vec3(1.0f , 1.0f, 1.0f));
+     model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
+     model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
+     setMatrices();
+    Tree->render();
+}
 void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     DrawSkyBox();
+
     DrawTerrain();
 
+    DrawSword();
+
+    DrawTrees();
 
 
-    prog.use();
-    model = mat4(1.0f);
-    setMatrices();
-    vec4 lightPos = vec4(10.0f*cos(angle), 10.0f, 10.0f*sin(angle), 1.0f);
-    prog.setUniform("Spot.Position", vec3(view * lightPos));
-    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    prog.setUniform("Spot.Direction", normalMatrix*vec3(-lightPos));
 
-    prog.setUniform("Light.Position", view * vec4(10.0f * cos(angle), 1.0f, 10.0f * sin(angle), 1.0f));
-
-    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.09f));
-    prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    prog.setUniform("Material.Ka", vec3(0.2f*0.3f, 0.55f*0.3f, 0.9f*0.3f));  
-    prog.setUniform("Material.Shininess", 100.0f);
    
-    model = mat4(1.0f);
-    setMatrices();
-    ogre->render();
-
-    setMatrices();
-
 
 }
 

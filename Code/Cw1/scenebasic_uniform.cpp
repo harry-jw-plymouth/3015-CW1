@@ -318,19 +318,20 @@ void SceneBasic_Uniform::ProcessUserInput(int key,int action) {
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             if (key == GLFW_KEY_W) {
                 EyeCoordinates += movementSpeed * CameraFront;
-             //   std::cout << "Key: " << key << std::endl;
+                std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_A) {
                 EyeCoordinates -= normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-               // std::cout << "Key: " << key << std::endl;
+                std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_S) {
                 EyeCoordinates -= movementSpeed * CameraFront;
-             //   std::cout << "Key: " << key << std::endl;
+                std::cout << "Key: " << key << std::endl;
             }
             else if (key == GLFW_KEY_D) {
+
                 EyeCoordinates += normalize(cross(CameraFront, CameraUp)) * movementSpeed;
-             //   std::cout << "Key: " << key << std::endl;
+               std::cout << "Key: " << key << std::endl;
             }
         }
     }
@@ -462,8 +463,7 @@ void SceneBasic_Uniform::render()
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     prog.setUniform("StandardTexture", 0);
 
     glActiveTexture(GL_TEXTURE1);
