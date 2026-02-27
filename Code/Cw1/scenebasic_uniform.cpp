@@ -463,6 +463,7 @@ void SceneBasic_Uniform::render()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
 <<<<<<< HEAD
+<<<<<<< HEAD
     prog.setUniform("StandardTexture", 0);
 
     glActiveTexture(GL_TEXTURE1);
@@ -471,6 +472,10 @@ void SceneBasic_Uniform::render()
 
 
     //set pos of sword mode;
+=======
+  //  prog .setUniform("Tex1", 0);
+    prog.setUniform("Tex1", 0);
+>>>>>>> parent of b35245e (Added texture for normal mapping sword)
 =======
   //  prog .setUniform("Tex1", 0);
     prog.setUniform("Tex1", 0);

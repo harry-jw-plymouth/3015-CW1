@@ -59,6 +59,7 @@ vec3 BlinnphongSpot(vec3 position,  vec3 n){
 
 void main() {
 <<<<<<< HEAD
+<<<<<<< HEAD
     //do normal mapping
     vec3 Norm=texture(NormalMapTex,TexCoord).xyz;
     Norm.xy=2.0*Norm.xy-1.0;
@@ -67,6 +68,9 @@ void main() {
 
 
     //FragColor=vec4(BlinnphongSpot(normalize(Norm)),1.0);
+=======
+    FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+>>>>>>> parent of b35245e (Added texture for normal mapping sword)
 =======
     FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
 >>>>>>> parent of b35245e (Added texture for normal mapping sword)
