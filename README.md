@@ -34,6 +34,7 @@ Sky box/ground texture : https://opengameart.org/content/forest-skyboxes
 Tree: https://free3d.com/3d-model/tree02-35663.html?dd_referrer=
 # A Link to the unlisted YouTube Video 
 # AI statement
+![Main menu sample](MDImages/UseOfAI.png)  
 Ai was used in a partnered role in the development of this prototype. For details on its use please see below
 ## Uses 
 ### Creating game assets
