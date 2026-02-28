@@ -81,8 +81,6 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj", true);
     Tree = ObjMesh::load("../Cw1/media/Tree.obj");
-    ogre = ObjMesh::load("../Cw1/media/bs_ears.obj", false, true);
-   /// mesh = ObjMesh::load("../Lab 1/media/pig_triangulated.obj",true);
 }
 void SceneBasic_Uniform::SetUpTerrain() {
     terrainVertices = new GLfloat[MAP_SIZE][6];
@@ -220,15 +218,15 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("Spot.La", vec3(0.05f));
 
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
-    GLuint texID = Texture::loadTexture("media/texture/ogre_diffuse.png");
-    GLuint texID2 = Texture::loadTexture("media/texture/ogre_normalmap.png");
+    SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
+    MossTexture = Texture::loadTexture("media/texture/moss.png");
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texID);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
 
     
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texID2);
+    glBindTexture(GL_TEXTURE_2D, MossTexture);
 
    
     prog.setUniform("Spot.La", vec3(0.5f));
@@ -322,8 +320,8 @@ void SceneBasic_Uniform::ProcessUserInput(int key, int action) {
 void SceneBasic_Uniform::compile()
 {
     try {
-        prog.compileShader("shader/NewVertexShader.vert");
-        prog.compileShader("shader/NewFragmentShader.frag");
+        prog.compileShader("shader/FinalVertexShader.vert");
+        prog.compileShader("shader/FinalFragmentShader.frag");
         prog.link();
         prog.use();
 
@@ -399,9 +397,8 @@ void SceneBasic_Uniform::DrawSkyBox() {
     glDepthFunc(GL_LESS);
 }
 void SceneBasic_Uniform::DrawSword() {
-    prog.use();
-    model = mat4(1.0f);
-    setMatrices();
+    prog.use();;
+
     vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
     prog.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
@@ -409,15 +406,15 @@ void SceneBasic_Uniform::DrawSword() {
 
     prog.setUniform("Light.Position", view * vec4(10.0f * cos(angle), 1.0f, 10.0f * sin(angle), 1.0f));
 
-    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.09f));
-    prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    prog.setUniform("Material.Kd", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
     prog.setUniform("Material.Shininess", 100.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, SwordTexture);
+    glBindTexture(GL_TEXTURE_2D, MossTexture);
 
     model = mat4(1.0f);
     SwordPos = vec3(0.0f, 1.3f, 0.0f);
@@ -425,21 +422,38 @@ void SceneBasic_Uniform::DrawSword() {
     model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
     SwordInStone->render();
-    ogre->render();
+    //ogre->render();
     setMatrices();
 
 }
-void SceneBasic_Uniform::DrawTrees() {
+void SceneBasic_Uniform::DrawTree(vec3 Pos, vec3 Rotation,vec3 Scale) {
     model = mat4(1.0f);
-
-     //model = glm::translate(model, Tree1Pos);
-     //model = glm::translate(model,  vec3(0.8, -3.0f, 9.5f) + SwordOffset);
-     model = glm::translate(model, vec3(0.0f, -2.0f, 0.0f) );
-     model = glm::scale(model, vec3(1.0f , 1.0f, 1.0f));
-     model = glm::rotate(model, glm::radians(-14.0f), vec3(0.0f, 0.0f, 1.0f));
-     model = glm::rotate(model, glm::radians(-5.0f), vec3(1.0f, 0.0f, 0.0f));
-     setMatrices();
+    model = glm::translate(model, Pos);
+    model = glm::scale(model, Scale);
+    model = glm::rotate(model, glm::radians(Rotation.x), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(Rotation.y), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(Rotation.z), vec3(0.0f, 0.0f, 1.0f));
+    setMatrices();
     Tree->render();
+}
+void SceneBasic_Uniform::DrawTrees() {
+     DrawTree(vec3(0.0f, 0.2f, -2.5f), vec3(0.0f, -14.0f, -5.0f), vec3(0.8f));
+     DrawTree(vec3(-4.0f, 0.2f, -2.0f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-5.0f, 0.2f, 1.0f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(4.0f, 0.2f, 2.0f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(5.0f, 0.2f, -2.3f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-1.0f, 0.2f, -5.0f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(5.5f, 0.2f, 5.0f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-5.5f, 0.2f, 5.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-3.5f, 0.2f, -6.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(3.2f, 0.2f, -5.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(0.0f, 0.2f, -6.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-7.0f, 0.2f, 0.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-9.0f, 0.2f, 0.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(-9.0f, 0.2f, 9.4f), vec3(0.0f), vec3(0.9f));
+     DrawTree(vec3(9.0f, 0.2f, 9.4f), vec3(0.0f), vec3(0.9f));
+    
+
 }
 void SceneBasic_Uniform::render()
 {

@@ -30,6 +30,7 @@ private:
     Cube cube;
     SkyBox SkyBox;
     GLuint SwordTexture;
+    GLuint MossTexture;
     GLuint GroundTexture;
 
     std::unique_ptr<ObjMesh>SwordInStone;
@@ -47,6 +48,7 @@ private:
 public:
     SceneBasic_Uniform();
     void DrawSword();
+    void DrawTree(glm::vec3 Pos, glm::vec3 Rotation, glm:: vec3 Scale);
     void DrawTrees();
     void DrawSkyBox();
     void DrawTerrain();
