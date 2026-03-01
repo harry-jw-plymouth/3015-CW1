@@ -21,10 +21,14 @@ uniform struct SpotLightInfo{
 
 uniform struct MaterialInfo{
     vec3 Kd;
-    vec3 Ka; //how strongly the ,aterial reacts to ambient light
+    vec3 Ka; //how strongly the material reacts to ambient light
     vec3 Ks;
     float Shininess;
 }Material;
+
+//toon shading
+const int Shaderlevels=6;
+const float scaleFactor=1.0/Shaderlevels;
 
 //s=light LightDirection, position=EyeCoordinates
 vec3 BlinnphongSpot( vec3 position, vec3 n){
@@ -45,7 +49,7 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
         float sDotN=max(dot(s,n),0.0);
-        diffuse=Material.Kd*col*sDotN;
+        diffuse=Material.Kd*col*floor(sDotN*Shaderlevels)*scaleFactor;
         if(sDotN>0.0){
             vec3 v=normalize(-position.xyz);
             vec3 h=normalize(v+s);

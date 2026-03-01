@@ -346,9 +346,11 @@ void SceneBasic_Uniform::update(float t)
     float deltaT = t - tPrev;
     if (tPrev == 0.0f)deltaT = 0.0f;
     tPrev = t;
-    angle += 0.25f * deltaT;
+    angle += 0.05f * deltaT;
     if (angle > glm::two_pi<float>())angle -= glm::two_pi<float>();
     deltaTime = deltaT;
+
+    //update view for updated eye coorindates
     view = glm::lookAt(EyeCoordinates, EyeCoordinates + CameraFront, CameraUp);
 }
 void SceneBasic_Uniform::setMatrices() {
