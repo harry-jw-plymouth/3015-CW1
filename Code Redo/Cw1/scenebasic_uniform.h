@@ -32,9 +32,13 @@ private:
     GLuint SwordTexture;
     GLuint MossTexture;
     GLuint GroundTexture;
+    GLuint ButterflyTexture;
 
     std::unique_ptr<ObjMesh>SwordInStone;
     std::unique_ptr<ObjMesh>Tree;
+    std::unique_ptr<ObjMesh>Butterfly;
+
+   
 
     float angle;
     float tPrev;
@@ -46,8 +50,16 @@ private:
     std::unique_ptr<ObjMesh>ogre;
  //   std::unique_ptr<ObjMesh>mesh;
 public:
+    glm::vec3 MainButterflyPos;
+    glm::vec3 MainButterflyRotaion;
+    glm::vec3 MainButterflyScale;
+    glm::mat4 ButterflyModel;
+
     SceneBasic_Uniform();
     void DrawSword();
+    void MoveButterflies();
+    void DrawButterfly(glm::vec3 Pos, glm::mat4 ButterFlyModel);
+    void DrawButterflies();
     void DrawTree(glm::vec3 Pos, glm::vec3 Rotation, glm:: vec3 Scale);
     void DrawTrees();
     void DrawSkyBox();

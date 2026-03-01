@@ -79,6 +79,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
+    Butterfly = ObjMesh::load("../Cw1/media/Butterfly/_butterfly.obj");
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj", true);
     Tree = ObjMesh::load("../Cw1/media/Tree.obj");
 }
@@ -217,9 +218,11 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("Spot.L", vec3(1.0f));
     prog.setUniform("Spot.La", vec3(0.05f));
 
+    //Get object textures
     //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
     SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
     MossTexture = Texture::loadTexture("media/texture/moss.png");
+    ButterflyTexture = Texture::loadTexture("media/Butterfly/texture.bmp");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
@@ -233,7 +236,7 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
 
-
+    //set up terrain
     TerrainShaders.use();
     TerrainShaders.setUniform("TerrainStart", glm::vec2(10.0f, 10.0f));
     TerrainShaders.setUniform("TerrainSize", TerrainSize);
@@ -246,6 +249,13 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, GroundTexture);
     TerrainShaders.setUniform("GroundTexture", 0);
 
+
+    //Set start for for butterfly
+    MainButterflyPos = vec3(1.0f, 2.3f, 1.0f);
+    MainButterflyRotaion=vec3(0.0f,90.0f,0.0f); 
+    MainButterflyScale = vec3(0.003f);
+
+    ButterflyModel = glm::rotate(ButterflyModel, glm::radians(-45.0f), vec3(0.0f, 1.0f, 0.0f));
 
 }
 void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
@@ -352,6 +362,9 @@ void SceneBasic_Uniform::update(float t)
 
     //update view for updated eye coorindates
     view = glm::lookAt(EyeCoordinates, EyeCoordinates + CameraFront, CameraUp);
+
+    //Move pos of butterfly for scene animation
+    MoveButterflies();
 }
 void SceneBasic_Uniform::setMatrices() {
     mat4 mv = view * model;
@@ -457,6 +470,65 @@ void SceneBasic_Uniform::DrawTrees() {
     
 
 }
+int ButterflyYDirCount = 10;
+int ButterflyXDirCount = 0;
+int RotateFrame = 16;
+float Rotation = 45.0f;
+bool CurrentlyMovingUp = true; bool CurrentlyMovingForward = false;
+void SceneBasic_Uniform::MoveButterflies() {
+    float YSpeed = 0.1f;
+    float XSpeed = 0.2f;
+    float ZSpeed = 0.2f;
+    ButterflyYDirCount++;
+    ButterflyXDirCount++;
+
+    if (ButterflyYDirCount == 200) {
+        CurrentlyMovingUp = !CurrentlyMovingUp;
+        ButterflyYDirCount = 0;
+    }
+    if (ButterflyXDirCount == 6000) {
+        ButterflyXDirCount = 0;
+        CurrentlyMovingForward = !CurrentlyMovingForward;
+        RotateFrame = 0;
+    }
+    if (!CurrentlyMovingUp) {
+        YSpeed = -0.1f;
+    }
+    if (!CurrentlyMovingForward) {
+        XSpeed = -0.2f;
+        ZSpeed = -0.2f;
+    }
+    if (RotateFrame < 16) {
+        Rotation += 11.25f;
+        RotateFrame++;
+        //cout<<"Rotate frame \n";
+    }
+    MainButterflyPos.x += XSpeed * deltaTime;
+    MainButterflyPos .y += YSpeed * deltaTime;
+    MainButterflyPos.z += XSpeed * deltaTime;
+  //  MainButterflyRotaion.y += Rotation;
+    ButterflyModel = mat4(1.0f);
+    ButterflyModel = translate(ButterflyModel, MainButterflyPos);
+    ButterflyModel = rotate(ButterflyModel, radians(Rotation), vec3(0.0f, 1.0f, 0.0f));
+    ButterflyModel = scale(ButterflyModel, MainButterflyScale);
+    
+}
+
+void SceneBasic_Uniform::DrawButterfly(glm::vec3 Pos, mat4 ButterFlyModel) {
+    model = ButterFlyModel;
+    setMatrices();
+    Butterfly->render();
+
+}
+void SceneBasic_Uniform::DrawButterflies() {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, ButterflyTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ButterflyTexture);
+
+    DrawButterfly(MainButterflyPos, ButterflyModel);
+
+}
 void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -469,6 +541,8 @@ void SceneBasic_Uniform::render()
     DrawSword();
 
     DrawTrees();
+
+    DrawButterflies();
 
 
 
