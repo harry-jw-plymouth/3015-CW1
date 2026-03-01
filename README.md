@@ -1,3 +1,10 @@
+# Important
+## Mention how aspects of 3016 was reused
+## Add video link 
+## Check over AI statement 
+## Add link to butterfly model source 
+
+
 # 3015-CW1
 # System information
 ## Visual studio version:2022
