@@ -449,6 +449,8 @@ void SceneBasic_Uniform::DrawSword() {
 
 }
 void SceneBasic_Uniform::DrawTree(vec3 Pos, vec3 Rotation,vec3 Scale) {
+
+   
     model = mat4(1.0f);
     model = glm::translate(model, Pos);
     model = glm::scale(model, Scale);
@@ -459,6 +461,16 @@ void SceneBasic_Uniform::DrawTree(vec3 Pos, vec3 Rotation,vec3 Scale) {
     Tree->render();
 }
 void SceneBasic_Uniform::DrawTrees() {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, TreeTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, MossTexture);
+
+    prog.setUniform("Material.Kd", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Material.Ka", vec3(0.5f));
+    prog.setUniform("Material.Shininess", 100.0f);
+
      DrawTree(vec3(0.0f, 0.2f, -2.5f), vec3(0.0f, -14.0f, -5.0f), vec3(0.8f));
      DrawTree(vec3(-4.0f, 0.2f, -2.0f), vec3(0.0f), vec3(0.9f));
      DrawTree(vec3(-5.0f, 0.2f, 1.0f), vec3(0.0f), vec3(0.9f));
@@ -474,8 +486,6 @@ void SceneBasic_Uniform::DrawTrees() {
      DrawTree(vec3(-9.0f, 0.2f, 0.4f), vec3(0.0f), vec3(0.9f));
      DrawTree(vec3(-9.0f, 0.2f, 9.4f), vec3(0.0f), vec3(0.9f));
      DrawTree(vec3(9.0f, 0.2f, 9.4f), vec3(0.0f), vec3(0.9f));
-    
-
 }
 int ButterflyYDirCount = 10;
 int ButterflyXDirCount = 0;
@@ -550,10 +560,6 @@ void SceneBasic_Uniform::render()
     DrawTrees();
 
     DrawButterflies();
-
-
-
-   
 
 }
 

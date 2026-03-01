@@ -38,13 +38,14 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
 
     vec3 col=mix(texColor.rgb,MossTexColour.rgb,MossTexColour.a);
     
-    vec3 ambient=Spot.La*Material.Ka*texColor;
+    //vec3 ambient=Spot.La*Material.Ka*texColor;
+    vec3 ambient=Spot.La*Material.Ka*col;
 
     vec3 s=normalize(Spot.Position-position);
 
     float cosAng=dot(-s, normalize(Spot.Direction));
     float angle=acos(cosAng);
-    float spotScale;
+    float spotScale=0.0;
 
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
