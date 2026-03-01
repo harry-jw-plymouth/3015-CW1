@@ -195,10 +195,7 @@ void SceneBasic_Uniform::SetUpTerrain() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-
-void SceneBasic_Uniform::initScene()
-{
-    compile();
+void SceneBasic_Uniform::SetupSkybox() {
     SkyBoxShaders.use();
 
     glEnable(GL_DEPTH_TEST);
@@ -210,32 +207,20 @@ void SceneBasic_Uniform::initScene()
     //  GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/Skybox/Forest/forest-skyboxes/Brudslojan");
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
-
-
-    view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
-    prog.use();
-   
-    prog.setUniform("Spot.L", vec3(1.0f));
-    prog.setUniform("Spot.La", vec3(0.05f));
-
-    //Get object textures
-    //GLuint texID = Texture::loadTexture("../Project_Template/media/texture/brick1.jpg");
+}
+void SceneBasic_Uniform::LoadTextures() {
     SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
     MossTexture = Texture::loadTexture("media/texture/moss.png");
     ButterflyTexture = Texture::loadTexture("media/Butterfly/texture.bmp");
+    TreeTexture= Texture::loadTexture("media/Butterfly/TreeTexture.png");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
 
-    
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, MossTexture);
-
-   
-    prog.setUniform("Spot.La", vec3(0.5f));
-    prog.setUniform("Spot.Exponent", 50.0f);
-    prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
-
+}
+void SceneBasic_Uniform::LoadTerrain() {
     //set up terrain
     TerrainShaders.use();
     TerrainShaders.setUniform("TerrainStart", glm::vec2(10.0f, 10.0f));
@@ -248,15 +233,37 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, GroundTexture);
     TerrainShaders.setUniform("GroundTexture", 0);
-
-
+}
+void SceneBasic_Uniform::SetupButterflyStart() {
     //Set start for for butterfly
     MainButterflyPos = vec3(1.0f, 2.3f, 1.0f);
-    MainButterflyRotaion=vec3(0.0f,90.0f,0.0f); 
+    MainButterflyRotaion = vec3(0.0f, 90.0f, 0.0f);
     MainButterflyScale = vec3(0.003f);
 
     ButterflyModel = glm::rotate(ButterflyModel, glm::radians(-45.0f), vec3(0.0f, 1.0f, 0.0f));
+}
+void SceneBasic_Uniform::initScene()
+{
+    compile();
 
+    SetupSkybox();
+
+    view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
+    prog.use();
+   
+    prog.setUniform("Spot.L", vec3(1.0f));
+    prog.setUniform("Spot.La", vec3(0.05f));
+
+    //Get object textures
+    LoadTextures();  
+
+    prog.setUniform("Spot.La", vec3(0.5f));
+    prog.setUniform("Spot.Exponent", 50.0f);
+    prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
+
+    LoadTerrain();
+
+    SetupButterflyStart();
 }
 void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
     // std::cout << "Moving mouse" << "\n";

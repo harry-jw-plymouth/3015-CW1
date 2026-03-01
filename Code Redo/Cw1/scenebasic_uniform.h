@@ -33,6 +33,7 @@ private:
     GLuint MossTexture;
     GLuint GroundTexture;
     GLuint ButterflyTexture;
+    GLuint TreeTexture;
 
     std::unique_ptr<ObjMesh>SwordInStone;
     std::unique_ptr<ObjMesh>Tree;
@@ -56,6 +57,10 @@ public:
     glm::mat4 ButterflyModel;
 
     SceneBasic_Uniform();
+    void LoadTextures();
+    void SetupButterflyStart();
+    void LoadTerrain();
+    void SetupSkybox();
     void DrawSword();
     void MoveButterflies();
     void DrawButterfly(glm::vec3 Pos, glm::mat4 ButterFlyModel);
