@@ -1,5 +1,4 @@
 # Important
-## Mention how aspects of 3016 was reused
 ## Add video link 
 ## Check over AI statement 
 
@@ -45,7 +44,10 @@ One of the key techniques used was the sampling of textures for the different ob
 In addition to this texture mixing was used, this allowed for extra looks/effects to be added to enhance other textures. For example the moss texture is mixed with the sword in the stone to give it an overgrown sort of look in line with the forest scene. 
 
 ### Skybox shaders
+The skybox shaders were somewhat simple shaders, simply placing 6 textures on the insides of a cube around the scene. This can be seen in "SkyBoxFragmentShader.frag" and "SkyBoxVertexShader.vert"
 ### Terrain shaders  
+The terrain shaders were created to specifically place the ground texture over the flat plain of space. As the terrain was set up with many different vertexes, the shader was designed to to draw a part of the whole texture on each part to make the complete texture displayed. 
+Ai was used to assist with this, to see details of this please see the Ai statement later in this file 
 
 ## C++
 C++ was used to arrange the scene and connect the shaders too it.
