@@ -2,7 +2,6 @@
 ## Mention how aspects of 3016 was reused
 ## Add video link 
 ## Check over AI statement 
-## Add link to butterfly model source 
 
 
 # 3015-CW1
@@ -12,21 +11,44 @@
 
 # How does it work? 
 ## Interactivity 
+### Keyboard
 Using the GLFW library, the ability to move the camera/view was implemented. Using GLFW key detection WASD movement was implemented, this was done by using the code from the 3016 module as a base, then reworking it to fit in with the template and code used in this prototype. To actually get the code to recognise the key inputs and act on them,the 'ProcessUserInput' was first created in the Scenebasic_uniform class(this was where the code to move the camera position was placed).
 Then in the 'mainLoop' in scenerunner, glfw will check for inputs, and if a key was pressed it will call the previosuly mentioned function, passing the pressed key so it can act accordingly. In addition a virtual instance of the ProcessUserInput function was placed in Scene.h to allow the code in Scenerunner to access it. The function in scenebasic uniform then overrides this 
-## How the scene fits together 
+
+
+## How the scene elements fits together 
 The scene itself has multiple parts which all come together to make the complete scene.
 Firstly, a skybox is present. This creates a backdrop wherever you look in the scene so that it appears the scene is set in the middle of a forest 
 In the center of that skybox is a simple piece of terrain,this was a flat surface that acted as a base for the other parts of the scene, preventing them from just appearing floating. To ensure the floor created did not conflict with the skybox, it was set to be covered by the texture used for the bottom of the skybox. While it is still possible to zoom out and see where the skybox starts and the base ends, the majority of angles are enhanced by this effect and it helps the scene look like it is placed in a forest. With the scene set, the focus could now be moved to objects within the scene. To start of, the centerpiece (the sword in the stone) was placed. This was placed right in the center of the scene/view as it was intended as the most important part of the scene
-In addition to this main model, a variety of other models were placed to help the scene feel populated
+In addition to this main model, other models were placed around to help the scene feel populated. A key example of this is the trees that were placed around. These were placed in a variety of locations to make the setting of the forest around the sword feel present. This were placed around the sword on all sides except the front, allowing for a clear view from where the camera starts. additionally they were placed 2-3 trees deep on each side to present a populated forest surrounding the sword.
+The trees also serve the purpose of hiding the somewhat harsh transition between the actual trees and the sky box background.
+Another model that was placed in the scene was a butterfly, this was quite a small model but it added some extra colour to the scene and helped the scene feel alive. In addition it had some scene animations allowing it to move back and forth to add life to the scene 
 
 
 # How does your code fit together and how should a programmer navigate it (not intended to be an exercise in formally documenting the code)?
 ## Libraries/externals used 
 
 ## Code arrangement 
-The code is split into a few different parts, the vertex/fragment shaders, the Scenerunner and the Scenebasic uniform class. 
+The code is built around the template provided and makes use of both C++ code and fragment and vertex shaders. 
 ### Shaders
+For better organisation, the shaders are spread between 3 different shaders(each with a fragment and vertex shader), these were the object/model shaders, terrain shaders and the skybox shaders. These all complete very seperate functionalities which is why they are seperated from each other.
+### Object shaders 
+Object shaders were the most important shader as they provided lighting and attached textures to the different objects within the scene. These were implemented in the "FinalFragmentShader.frag" and "FinalVertexShader.vert" files
+#### Toon shading 
+Toon shading was implemented in the shader to give the scene a more cartoony look. This was done by adding less of a gradual shift between differant light levels to emulate the look of how cartoons are drawn/shaded. This can be seen where scalefactor and shaderlevels are used.
+#### Spotlight 
+To highlight the center piece of the seen (the sword in stone model) a spotlight was used. This slowly moves around the model to highlight different parts of it and how it looks under differant levels of shading. This was implemented by checking the position of each part of the model relative to the source of the spotlight, and based on the light intensity of that position of the spotlight, the model will have its light level adjusted accordingly. This allowed for the sword to be highlighted in quite an interesting way
+#### Blinnphong 
+The main part of the code was to create the blinn phong shading model, which acted as the core of the object shaders. This calculated the lighting for each vertex based on the way the light was shining on it.This can be seen in the blinnphongspot function
+#### Texture mixing and sampling
+One of the key techniques used was the sampling of textures for the different objects in the scene. These were passed to the shaders after being loaded by C++ where they were then placed on the model accordingly 
+In addition to this texture mixing was used, this allowed for extra looks/effects to be added to enhance other textures. For example the moss texture is mixed with the sword in the stone to give it an overgrown sort of look in line with the forest scene. 
+
+### Skybox shaders
+### Terrain shaders  
+
+## C++
+C++ was used to arrange the scene and connect the shaders too it.
 ### Scenebasic uniform 
 #### render
 Render was the function where all code associated with rendering was placed. The function was called frequently, constantly re rendering the scene to keep the view up to date with any transformations that have occured. For ease of organising code, different rendering parts were put into their own functions which were then called by render. For example the sword object has its own function that sets the model to the right position and then renders it 
@@ -38,7 +60,12 @@ In the process of rendering, the shaders are interacted allowing for values in t
 Some models/resources used were found online. Below is links to the creators/suppliers of these models 
 Sword in stone: https://sketchfab.com/3d-models/low-poly-sword-in-stone-974632056a2e4da299021824ec3df427#download 
 Sky box/ground texture : https://opengameart.org/content/forest-skyboxes 
-Tree: https://free3d.com/3d-model/tree02-35663.html?dd_referrer=
+Tree: https://free3d.com/3d-model/tree02-35663.html?dd_referrer= 
+Butterfly: https://www.turbosquid.com/3d-models/butterfly-fly-3d-obj/460590
+
+## Partial re use of 3016 
+It should be noted that very small parts of the scene used parts of the 3016 module as a base. For example the code to make the butterfly move back and forth was taken from my second coursework submission for that module. It was not just copied directly however, due to the different sizing of the scene, compared to the scene present in that project the movement speeds and distance was on an entirely different scale. So to adapt this to work with the current scene the movement speed was increased and the amount of time/amount of moves the model moves before turning was increased. In addition, it had its direction changed slightly, in the original code it would either travel vertically or horizontally across the scene requiring just a change to the x cooridnate. But for this scene I decided I wanted it to travel diagonally, so the code was adjusted to accomodate for this. The butterfly model itself was also the same used in the 3016 coursework. To see the original soruce of this please see the section above
+The terrain generation code was also created using code from the 3016 labs to set up a flat piece of ground. This was also adjusted, editing the size of the flat ground to better create the desired ground effect. Before then editing the terrain shader to display a texture over it(please note AI was used as to assist with this, for more information on this please see the use of AI statement)
 # A Link to the unlisted YouTube Video 
 # AI statement
 ![Main menu sample](MDImages/UseOfAI.png)  
@@ -50,4 +77,5 @@ During development, the intention was to implement normal mapping, and for this 
 ### code assistant
 AI tools were used throughout development as a coding assistant. A key example of this was debugging. When a situation arose where the problem is not instantly noticable and finding it may take excessive time, AI was asked to pin point where the problem was. For example, at one point the lighting was getting attached to the camera in a strange way and thus the lighting for models was off. In this case AI was able to point out that I was passing the wrong value due to a piece of code I had missed that was overriding correct values.
 It was also used as a coding assistant to advise on how to move forward with sections I was not initally sure how too. For example, when programming the camera movement, I was unsure initally how to edit the position and use GLFW functionality if the GLFW window was in scene runner but I was wanting to place code for this in scenebasic uniform. The AI suggested the solution (mentioned in the how does it work section) which I was then able to implement 
+Another key example of where AI was used was for correctly setting up the texture on the terrain. Originally when setting this up the texture would repeat for every single "square" in the terrain, as the fragment shader was treating each sqaure as an entirely seperate object. This made the terrain look unusual and far from what was desired. While I was understanding the issue,I was unable to figure out exactly how to fix it. For this reason AI was used to point out where I was going wrong, suggesting the addition of new uniform values allowing the code to calculate which bit of the texture should be rendered on each "square" of the terrain grid.
 It was also a great help in shaders when it came to assisting with solving issues as this was an area where lots of isses arose when developing
