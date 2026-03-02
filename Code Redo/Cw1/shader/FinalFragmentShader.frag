@@ -30,8 +30,8 @@ uniform struct MaterialInfo{
 const int Shaderlevels=6;
 const float scaleFactor=1.0/Shaderlevels;
 
-//s=light LightDirection, position=EyeCoordinates
-vec3 BlinnphongSpot( vec3 position, vec3 n){
+// position=EyeCoordinates
+vec3 BlinnphongSpot( vec3 position, vec3 CurrentNormal){
     vec3 diffuse=vec3(0), spec=vec3(0);
     vec3 texColor=texture(MainTexture,TexCoord).rgb;
     vec4 MixTexColour=texture(MixTexture,TexCoord);
@@ -40,27 +40,25 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
     
     vec3 AmbientLighting=Spot.La*Material.Ka*MixedColour;
 
-    vec3 s=normalize(Spot.Position-position);
+    vec3 LightDirection=normalize(Spot.Position-position);
 
-    float cosAng=dot(-s, normalize(Spot.Direction));
+    float cosAng=dot(-LightDirection, normalize(Spot.Direction));
     float angle=acos(cosAng);
     float spotScale=0.0;
 
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
-        float sDotN=max(dot(s,n),0.0);
+        float sDotN=max(dot(LightDirection,CurrentNormal),0.0);
         diffuse=Material.Kd*MixedColour*floor(sDotN*Shaderlevels)*scaleFactor;
         if(sDotN>0.0){
-            vec3 v=normalize(-position.xyz);
-            vec3 h=normalize(v+s);
-            spec=Material.Ks*pow(max(dot(h,n),0.0),Material.Shininess);
+            vec3 ViewDirection=normalize(-position.xyz);
+            vec3 HalfWay=normalize(ViewDirection+LightDirection);
+            spec=Material.Ks*pow(max(dot(HalfWay,CurrentNormal),0.0),Material.Shininess);
         }
     }
     return AmbientLighting+spotScale*(diffuse+spec)*Spot.L;
 }
 
 void main() {
-
-
     FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
 }

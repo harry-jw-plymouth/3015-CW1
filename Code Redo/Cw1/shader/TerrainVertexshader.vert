@@ -1,7 +1,6 @@
 #version 460
-//Triangle position with values retrieved from main.cpp
+
 layout (location = 0) in vec3 position;
-//Colour coordinates from last stage
 layout (location = 1) in vec3 colourVertex;
 
 //Model-View-Projection Matrix
@@ -9,7 +8,6 @@ uniform mat4 mvpIn;
 uniform vec2 TerrainStart;
 uniform float TerrainSize;
 
-//Colour to send
 out vec2 TexCoord;
 
 void main()

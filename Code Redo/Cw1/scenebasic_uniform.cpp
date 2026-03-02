@@ -258,7 +258,7 @@ void SceneBasic_Uniform::initScene()
     //Get object textures
     LoadTextures();  
 
-    prog.setUniform("Spot.La", vec3(0.5f));
+    prog.setUniform("Spot.La", vec3(0.4f));
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
 
