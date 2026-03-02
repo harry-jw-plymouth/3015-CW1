@@ -31,8 +31,10 @@ Another model that was placed in the scene was a butterfly, this was quite a sma
 
 # How does your code fit together and how should a programmer navigate it 
 ## Libraries/externals used 
-glad: 
-GLFW:
+-glad
+-GLFW
+-GLM
+-Open gl
 
 ## Code arrangement 
 The code is built around the template provided and makes use of both C++ code and fragment and vertex shaders. 
