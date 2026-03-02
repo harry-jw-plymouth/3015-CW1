@@ -73,7 +73,8 @@ It should be noted that very small parts of the scene used parts of the 3016 mod
 The terrain generation code was also created using code from the 3016 labs to set up a flat piece of ground. This was also adjusted, editing the size of the flat ground to better create the desired ground effect. Before then editing the terrain shader to display a texture over it(please note AI was used as to assist with this, for more information on this please see the use of AI statement)
 # A Link to the unlisted YouTube Video 
 # AI statement
-![Main menu sample](MDImages/UseOfAI.png)  
+![Main menu sample](MDImages/UseOfAI.png) 
+![Ai signature](MDImages/Ai_Signature.png)  
 Ai was used in a partnered role in the development of this prototype. For details on its use please see below
 ## Uses 
 ### Creating game assets
