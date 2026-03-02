@@ -5,8 +5,8 @@ in vec3 Normal;
 
 in vec2 TexCoord;
 
-layout (binding=0) uniform sampler2D Tex1;
-layout (binding=1) uniform sampler2D MossTex;
+layout (binding=0) uniform sampler2D MainTexture;
+layout (binding=1) uniform sampler2D MixTexture;
 layout (binding=2) uniform sampler2D;
 layout (location = 0)out vec4 FragColor;
 
@@ -33,13 +33,12 @@ const float scaleFactor=1.0/Shaderlevels;
 //s=light LightDirection, position=EyeCoordinates
 vec3 BlinnphongSpot( vec3 position, vec3 n){
     vec3 diffuse=vec3(0), spec=vec3(0);
-    vec3 texColor=texture(Tex1,TexCoord).rgb;
-    vec4 MossTexColour=texture(MossTex,TexCoord);
+    vec3 texColor=texture(MainTexture,TexCoord).rgb;
+    vec4 MixTexColour=texture(MixTexture,TexCoord);
 
-    vec3 col=mix(texColor.rgb,MossTexColour.rgb,MossTexColour.a);
+    vec3 MixedColour=mix(texColor.rgb,MixTexColour.rgb,MixTexColour.a);
     
-    //vec3 ambient=Spot.La*Material.Ka*texColor;
-    vec3 ambient=Spot.La*Material.Ka*col;
+    vec3 AmbientLighting=Spot.La*Material.Ka*MixedColour;
 
     vec3 s=normalize(Spot.Position-position);
 
@@ -50,14 +49,14 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
     if(angle>=0.0&&angle<Spot.Cutoff){
         spotScale=pow(cosAng,Spot.Exponent);
         float sDotN=max(dot(s,n),0.0);
-        diffuse=Material.Kd*col*floor(sDotN*Shaderlevels)*scaleFactor;
+        diffuse=Material.Kd*MixedColour*floor(sDotN*Shaderlevels)*scaleFactor;
         if(sDotN>0.0){
             vec3 v=normalize(-position.xyz);
             vec3 h=normalize(v+s);
             spec=Material.Ks*pow(max(dot(h,n),0.0),Material.Shininess);
         }
     }
-    return ambient+spotScale*(diffuse+spec)*Spot.L;
+    return AmbientLighting+spotScale*(diffuse+spec)*Spot.L;
 }
 
 void main() {

@@ -84,6 +84,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     Tree = ObjMesh::load("../Cw1/media/Tree.obj");
 }
 void SceneBasic_Uniform::SetUpTerrain() {
+    //code was taken with some adjustments from 3016
     terrainVertices = new GLfloat[MAP_SIZE][6];
     terrainIndices = new GLuint[trianglesGrid][3];
     // float SpaceBetween = 0.0625f;
@@ -203,7 +204,7 @@ void SceneBasic_Uniform::SetupSkybox() {
     projection = mat4(1.0f);
     model = mat4(1.0f);
     angle = glm::radians(90.0f);
-    GLuint SkyBoxTexture = Texture::loadCubeMap("../Cw1/media/texture/cube/pisa/Forest");
+    GLuint SkyBoxTexture = Texture::loadCubeMap("../Cw1/media/texture/ForestSkyBox/Forest");
     //  GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/Skybox/Forest/forest-skyboxes/Brudslojan");
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
@@ -493,6 +494,7 @@ int RotateFrame = 16;
 float Rotation = 45.0f;
 bool CurrentlyMovingUp = true; bool CurrentlyMovingForward = false;
 void SceneBasic_Uniform::MoveButterflies() {
+    // code adapted from part of my 3016 CW2 submission
     float YSpeed = 0.1f;
     float XSpeed = 0.2f;
     float ZSpeed = 0.2f;
@@ -531,11 +533,12 @@ void SceneBasic_Uniform::MoveButterflies() {
     
 }
 
+//function for placing and rendering butterfly
+//Designed so that any number of butterflies could be added
 void SceneBasic_Uniform::DrawButterfly(glm::vec3 Pos, mat4 ButterFlyModel) {
     model = ButterFlyModel;
     setMatrices();
     Butterfly->render();
-
 }
 void SceneBasic_Uniform::DrawButterflies() {
     glActiveTexture(GL_TEXTURE0);
