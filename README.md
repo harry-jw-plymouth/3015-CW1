@@ -1,5 +1,4 @@
 # Important
-## Mention how aspects of 3016 was reused
 ## Add video link 
 ## Check over AI statement 
 
