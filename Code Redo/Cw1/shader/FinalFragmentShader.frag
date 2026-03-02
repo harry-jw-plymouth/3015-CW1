@@ -7,8 +7,16 @@ in vec2 TexCoord;
 
 layout (binding=0) uniform sampler2D Tex1;
 layout (binding=1) uniform sampler2D MossTex;
-layout (binding=2) uniform sampler2D;
+//layout (binding=2) uniform sampler2D;
+
 layout (location = 0)out vec4 FragColor;
+
+uniform float EdgeThreshold;
+uniform float Weight[5];
+uniform int Pass;
+uniform vec2 TexelSize;
+
+const vec3 lum=vec3(0.2126,0.7152,0.0722);
 
 uniform struct SpotLightInfo{
     vec3 Position;
@@ -29,6 +37,10 @@ uniform struct MaterialInfo{
 //toon shading
 const int Shaderlevels=6;
 const float scaleFactor=1.0/Shaderlevels;
+
+float luminance(vec3 color){
+    return dot(lum,color);
+}
 
 //s=light LightDirection, position=EyeCoordinates
 vec3 BlinnphongSpot( vec3 position, vec3 n){
@@ -60,8 +72,48 @@ vec3 BlinnphongSpot( vec3 position, vec3 n){
     return ambient+spotScale*(diffuse+spec)*Spot.L;
 }
 
+vec4 pass1(){
+    return vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+}
+vec4 pass2(){
+    ivec2 pix =ivec2(gl_FragCoord.xy);// grab pixel to check if its an EdgeThreshold
+    return texelFetch(Tex1, pix, 0);
+    //pick neighbouring pixels for convolution filter
+    vec4 sum=texelFetch(Tex1,pix,0)*Weight[0];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,1))*Weight[1];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,-1))*Weight[1];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,2))*Weight[2];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,-2))*Weight[2];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,3))*Weight[3];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,-3))*Weight[3];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,4))*Weight[4];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(0,-4))*Weight[4];
+    return sum;
+}
+
+vec4 pass3(){
+    ivec2 pix=ivec2(gl_FragCoord.xy);
+    return texelFetch(Tex1, pix, 0);
+    vec4 sum=texelFetch(Tex1,pix,0)*Weight[0];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(1,0))*Weight[1];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(-1,0))*Weight[1];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(2,0))*Weight[2];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(-2,0))*Weight[2];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(3,0))*Weight[3];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(-3,0))*Weight[3];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(4,0))*Weight[4];
+    sum+=texelFetchOffset(Tex1,pix,0,ivec2(-4,0))*Weight[4];
+    return sum;
+}
+
 void main() {
-
-
-    FragColor=vec4(BlinnphongSpot(Position,normalize(Normal)),1.0);
+    if(Pass==1){
+        FragColor=pass1();
+    }
+    else if(Pass ==2){
+        FragColor=pass2();
+    }
+    else if(Pass==3){
+        FragColor=pass3();
+    }
 }

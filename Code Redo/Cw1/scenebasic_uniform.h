@@ -20,36 +20,36 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
-  //  GLuint vaoHandle;
+    //Shaders
     GLSLProgram prog;
-
     GLSLProgram SkyBoxShaders;
     GLSLProgram TerrainShaders;
-  //  float angle;
-
-    Cube cube;
+    
+    //Skybox
     SkyBox SkyBox;
+
+    //textures
     GLuint SwordTexture;
     GLuint MossTexture;
     GLuint GroundTexture;
     GLuint ButterflyTexture;
     GLuint TreeTexture;
 
+    //Objects
     std::unique_ptr<ObjMesh>SwordInStone;
     std::unique_ptr<ObjMesh>Tree;
-    std::unique_ptr<ObjMesh>Butterfly;
-
-   
+    std::unique_ptr<ObjMesh>Butterfly;   
 
     float angle;
     float tPrev;
     float rotSpeed;
     void compile();
-    Torus torus;
-    Teapot teapot;
-    Plane plane;
-    std::unique_ptr<ObjMesh>ogre;
- //   std::unique_ptr<ObjMesh>mesh;
+
+    //Gaussian blur
+    GLuint fsQuad, fboHandle;
+    GLuint renderFBO, intermediateFBO;
+    GLuint renderTex, intermediateTex;
+
 public:
     glm::vec3 MainButterflyPos;
     glm::vec3 MainButterflyRotaion;
@@ -75,8 +75,18 @@ public:
     void update( float t );
     void render();
     void resize(int, int);
+
+    //inputs
     void ProcessUserInput(int key, int action)override;
     void Mouse_CallBack(double xpos, double ypos)override;
+
+    // Gaussian blur
+    void SetupFBO();
+    void Pass1();
+    void Pass2();
+    void Pass3();
+    float gauss(float, float);
+
 };
 
 #endif // SCENEBASIC_UNIFORM_H

@@ -50,12 +50,12 @@ vec3 SwordPos;
 vec3 SwordOffset = vec3(2.0f, 2.f, -15.0f);
 vec3 SwordCenter;
 
-enum VAO_IDs { Triangles, Indices, Colours, Textures, NumVAOs = 2 };
+enum VAO_IDs { Triangles, Indices, Colours, Textures, NumVAOs,TerrainVAO=0 };
 //VAOs
 GLuint VAOs[NumVAOs];
 
 //Buffer types
-enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
+enum Buffer_IDs { TerrainVertexBuffer=0,TerrainIndexBuffer,ArrayBuffer, NumBuffers  };
 //Buffer objects
 GLuint Buffers[NumBuffers];
 
@@ -75,15 +75,14 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0.0f),
     angle(0.0f),
     rotSpeed(glm::pi<float>()/8.0f),
-    SkyBox(100.0f),
-    plane(50.0f,50.0f,1,1),
-    teapot(14,glm::mat4(1.0f)),
-    torus(1.75f*0.75f,1.75f*0.75f,50,50) {
+    SkyBox(100.0f){
     Butterfly = ObjMesh::load("../Cw1/media/Butterfly/_butterfly.obj");
     SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj", true);
     Tree = ObjMesh::load("../Cw1/media/Tree.obj");
 }
 void SceneBasic_Uniform::SetUpTerrain() {
+    //Code re used with some adaptions from 3016
+
     terrainVertices = new GLfloat[MAP_SIZE][6];
     terrainIndices = new GLuint[trianglesGrid][3];
     // float SpaceBetween = 0.0625f;
@@ -165,18 +164,18 @@ void SceneBasic_Uniform::SetUpTerrain() {
     //Sets index of VAO
     glGenVertexArrays(NumVAOs, VAOs);
     //Binds VAO to a buffer
-    glBindVertexArray(VAOs[0]);
+    glBindVertexArray(VAOs[TerrainVAO]);
     //Sets indexes of all required buffer objects
     glGenBuffers(NumBuffers, Buffers);
 
     //Binds vertex object to array buffer
-    glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
+    glBindBuffer(GL_ARRAY_BUFFER, Buffers[TerrainVertexBuffer]);
     //Allocates buffer memory for the vertices of the 'Triangles' buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * MAP_SIZE * 6, terrainVertices, GL_STATIC_DRAW);
     //glBufferData(GL_ARRAY_BUFFER, sizeof(terrainVertices), terrainVertices, GL_STATIC_DRAW);
 
     //Binding & allocation for indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[TerrainIndexBuffer]);
     // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(terrainIndices), terrainIndices, GL_STATIC_DRAW);
 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * trianglesGrid * 3, terrainIndices, GL_STATIC_DRAW);
@@ -191,9 +190,10 @@ void SceneBasic_Uniform::SetUpTerrain() {
     glEnableVertexAttribArray(1);
 
     //Unbinding
+   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  
 }
 void SceneBasic_Uniform::SetupSkybox() {
     SkyBoxShaders.use();
@@ -212,8 +212,9 @@ void SceneBasic_Uniform::LoadTextures() {
     SwordTexture = Texture::loadTexture("media/texture/SwordTexture.png");
     MossTexture = Texture::loadTexture("media/texture/moss.png");
     ButterflyTexture = Texture::loadTexture("media/Butterfly/texture.bmp");
-    TreeTexture= Texture::loadTexture("media/Butterfly/TreeTexture.png");
-
+    TreeTexture= Texture::loadTexture("media/texture/TreeTexture.png");
+    GroundTexture = Texture::loadTexture("media/texture/SkyBoxBottom.png");
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
 
@@ -225,12 +226,11 @@ void SceneBasic_Uniform::LoadTerrain() {
     TerrainShaders.use();
     TerrainShaders.setUniform("TerrainStart", glm::vec2(10.0f, 10.0f));
     TerrainShaders.setUniform("TerrainSize", TerrainSize);
-    // TerrainShaders.setUniform("mvpIn", projection * mv);
 
     SetUpTerrain();
-    GroundTexture = Texture::loadTexture("media/texture/SkyBoxBottom.png");
-    // GroundTexture = Texture::loadTexture("media/texture/Ground.png");
-    glActiveTexture(GL_TEXTURE1);
+   
+    //bind texture
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, GroundTexture);
     TerrainShaders.setUniform("GroundTexture", 0);
 }
@@ -242,21 +242,128 @@ void SceneBasic_Uniform::SetupButterflyStart() {
 
     ButterflyModel = glm::rotate(ButterflyModel, glm::radians(-45.0f), vec3(0.0f, 1.0f, 0.0f));
 }
+float SceneBasic_Uniform::gauss(float x, float sigma2) {
+    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
+    double expon = -(x * x) / (2.0 * sigma2);
+    return (float)(coeff * exp(expon));
+}
+void SceneBasic_Uniform::SetupFBO() {
+    std::cout << "SetupFBO: " << width << "x" << height << std::endl;
+    
+    // generate and bind the freamework
+    glGenFramebuffers(1, &renderFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+
+    //create the texture object
+    glGenTextures(1, &renderTex);
+    glBindTexture(GL_TEXTURE_2D, renderTex);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    //bind tectures to the FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    //Create the depth buffer 
+
+    GLuint DepthBuf;
+    glGenRenderbuffers(1, &DepthBuf);
+    glBindRenderbuffer(GL_RENDERBUFFER, DepthBuf);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    //Bind the depth buffer to the FBO
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, DepthBuf);
+    //Set the targets fro the fragment output variables
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, drawBuffers);
+    //Unbind the framebuffer and revert to the default frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glGenFramebuffers(1, &intermediateFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+    glGenTextures(1, &intermediateTex);
+    glActiveTexture(GL_TEXTURE1);        // use slot 1 instead of 0
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intermediateTex, 0);
+    glDrawBuffers(1, drawBuffers);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    //array for full screen quad
+    GLfloat verts[] = {
+        -1.0f,-1.0f,0.0f,1.0f,-1.0f,0.0f,1.0f,1.0f,0.0f,
+        -1.0f,-1.0f,0.0f,1.0f,1.0f,0.0f,-1.0f,1.0f,0.0f
+    };
+    GLfloat tc[] = {
+        0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,
+        0.0f,0.0f,1.0f,1.0f,0.0f,1.0f
+    };
+    //buffer set up
+    unsigned int handle[2];
+    glGenBuffers(2, handle);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+
+    // set up vertex array object
+    glGenVertexArrays(1, &fsQuad);
+    glBindVertexArray(fsQuad);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);//vertex position
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2);// texture coordinates
+    glBindVertexArray(0);
+
+    prog.use();
+    prog.setUniform("Tex1", 0);
+    prog.setUniform("MossTex", 1);
+
+    float weights[5], sum, sigma2 = 8.0f;
+    weights[0] = gauss(0, sigma2);
+    sum = weights[0];
+    for (int i = 1; i < 5; i++) {
+        weights[i] = gauss(float(i), sigma2);
+        sum += 2 * weights[i];
+    }
+    for (int i = 0; i < 5; i++) {
+        std::stringstream uniName;
+        uniName << "Weight[" << i << "]";
+        float val = weights[i] / sum;
+        prog.setUniform(uniName.str().c_str(), val);
+    }
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "FBO incomplete\n";
+
+    prog.use();
+    prog.setUniform("TexelSize", glm::vec2(1.0f / width, 1.0f / height));
+
+
+}
 void SceneBasic_Uniform::initScene()
 {
     compile();
 
+    
+
     SetupSkybox();
 
-    view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);
-    prog.use();
-   
-    prog.setUniform("Spot.L", vec3(1.0f));
-    prog.setUniform("Spot.La", vec3(0.05f));
+    //Set camera start 
+    view = glm::lookAt((EyeCoordinates), CameraFront, CameraUp);    
 
     //Get object textures
+    prog.use();
     LoadTextures();  
 
+    // Set light values 
+    prog.setUniform("Spot.L", vec3(1.0f));
     prog.setUniform("Spot.La", vec3(0.5f));
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
@@ -264,6 +371,20 @@ void SceneBasic_Uniform::initScene()
     LoadTerrain();
 
     SetupButterflyStart();
+
+
+    SetupFBO();
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "renderFBO incomplete: " << status << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "intermediateFBO incomplete: " << status << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void SceneBasic_Uniform::Mouse_CallBack(double Xpos, double Ypos) {
     // std::cout << "Moving mouse" << "\n";
@@ -397,7 +518,7 @@ void SceneBasic_Uniform::DrawTerrain() {
     TerrainShaders.setUniform("TerrainSize", TerrainSize);
     // TerrainShaders.setUniform("mvpIn", projection * mv);
 
-    glBindVertexArray(VAOs[0]);
+    glBindVertexArray(VAOs[TerrainVAO]);
     glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
 
 }
@@ -417,17 +538,19 @@ void SceneBasic_Uniform::DrawSkyBox() {
 
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
+
+    prog.use();
 }
 void SceneBasic_Uniform::DrawSword() {
     prog.use();;
+
+    prog.setUniform("Pass", 1); // FIX: re-set pass after terrain/skybox shader switches
 
     vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
     prog.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
     prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
-
     prog.setUniform("Light.Position", view * vec4(10.0f * cos(angle), 1.0f, 10.0f * sin(angle), 1.0f));
-
     prog.setUniform("Material.Kd", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
@@ -437,6 +560,8 @@ void SceneBasic_Uniform::DrawSword() {
     glBindTexture(GL_TEXTURE_2D, SwordTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, MossTexture);
+    prog.setUniform("Tex1", 0);
+    prog.setUniform("MossTex", 1);
 
     model = mat4(1.0f);
     SwordPos = vec3(0.0f, 1.3f, 0.0f);
@@ -444,9 +569,6 @@ void SceneBasic_Uniform::DrawSword() {
     model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
     SwordInStone->render();
-    //ogre->render();
-    setMatrices();
-
 }
 void SceneBasic_Uniform::DrawTree(vec3 Pos, vec3 Rotation,vec3 Scale) {
 
@@ -461,6 +583,11 @@ void SceneBasic_Uniform::DrawTree(vec3 Pos, vec3 Rotation,vec3 Scale) {
     Tree->render();
 }
 void SceneBasic_Uniform::DrawTrees() {
+    prog.use();
+    prog.setUniform("Pass", 1); // FIX
+    prog.setUniform("Tex1", 0);
+    prog.setUniform("MossTex", 1);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, TreeTexture);
     glActiveTexture(GL_TEXTURE1);
@@ -538,6 +665,11 @@ void SceneBasic_Uniform::DrawButterfly(glm::vec3 Pos, mat4 ButterFlyModel) {
 
 }
 void SceneBasic_Uniform::DrawButterflies() {
+    prog.use();
+    prog.setUniform("Pass", 1); // FIX
+    prog.setUniform("Tex1", 0);
+    prog.setUniform("MossTex", 1);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ButterflyTexture);
     glActiveTexture(GL_TEXTURE1);
@@ -546,20 +678,70 @@ void SceneBasic_Uniform::DrawButterflies() {
     DrawButterfly(MainButterflyPos, ButterflyModel);
 
 }
-void SceneBasic_Uniform::render()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
+void SceneBasic_Uniform::Pass1() {
+    prog.use();
+    prog.setUniform("Pass", 1);
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+    glViewport(0, 0, width, height);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                              // FIX 1: explicit clear colour
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     DrawSkyBox();
+    prog.use();                                                          // FIX 3: reclaim prog after skybox
+    prog.setUniform("Pass", 1);
 
     DrawTerrain();
 
+    prog.use();                                                          // FIX 5: reclaim prog after terrain shader
+    prog.setUniform("Pass", 1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, SwordTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, MossTexture);
+    prog.setUniform("Tex1", 0);                                         // FIX 7: ensure Tex1 points to slot 0
+    prog.setUniform("MossTex", 1);
     DrawSword();
 
     DrawTrees();
 
     DrawButterflies();
+
+}
+void SceneBasic_Uniform::Pass2() {
+    prog.setUniform("Pass", 2);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, renderTex);
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+    setMatrices();
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void SceneBasic_Uniform::Pass3() {
+    prog.setUniform("Pass", 3);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+    glClear(GL_COLOR_BUFFER_BIT);
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+    setMatrices();
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+void SceneBasic_Uniform::render()
+{
+    prog.use();
+    Pass1();
+    Pass2();
+    Pass3();
 
 }
 
@@ -569,4 +751,6 @@ void SceneBasic_Uniform::resize(int w, int h)
     height = h;
     glViewport(0, 0, w, h);
     projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
+
+   
 }
