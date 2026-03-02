@@ -10,22 +10,29 @@
 
 # How does it work? 
 ## Interactivity 
-### Keyboard
+### WASD Keyboard controls
 Using the GLFW library, the ability to move the camera/view was implemented. Using GLFW key detection WASD movement was implemented, this was done by using the code from the 3016 module as a base, then reworking it to fit in with the template and code used in this prototype. To actually get the code to recognise the key inputs and act on them,the 'ProcessUserInput' was first created in the Scenebasic_uniform class(this was where the code to move the camera position was placed).
-Then in the 'mainLoop' in scenerunner, glfw will check for inputs, and if a key was pressed it will call the previously mentioned function, passing the pressed key so it can act accordingly. In addition a virtual instance of the ProcessUserInput function was placed in Scene.h to allow the code in Scenerunner to access it. The function in scenebasic uniform then overrides this 
-
+Then in the 'mainLoop' in scenerunner, glfw will check for inputs, and if a key was pressed it will call the previously mentioned function, passing the pressed key so it can act accordingly. In addition a virtual instance of the ProcessUserInput function was placed in Scene.h to allow the code in Scenerunner to access it. The function in scenebasic uniform then overrides this. 
+The end result of this allowed for the WASD keys to act as direction inputs, with W as forward,a as left, s as back and d as right
+### Mouse controls
+Similar was done with mouse controls, with a function placed in scene basic uniform and then a reference added in scene.h. In additon this function was set to mouse call back in scene runner.h 
+The end result was the mouse controlling the direction of the camera allowing for the user to see the scene with a view from many angles
 
 ## How the scene elements fits together 
 The scene itself has multiple parts which all come together to make the complete scene.
+### skybox and terrtain ground 
 Firstly, a skybox is present. This creates a backdrop wherever you look in the scene so that it appears the scene is set in the middle of a forest 
-In the center of that skybox is a simple piece of terrain,this was a flat surface that acted as a base for the other parts of the scene, preventing them from just appearing floating. To ensure the floor created did not conflict with the skybox, it was set to be covered by the texture used for the bottom of the skybox. While it is still possible to zoom out and see where the skybox starts and the base ends, the majority of angles are enhanced by this effect and it helps the scene look like it is placed in a forest. With the scene set, the focus could now be moved to objects within the scene. To start off, the centerpiece (the sword in the stone) was placed. This was placed right in the center of the scene/view as it was intended as the most important part of the scene
+In the center of that skybox is a simple piece of terrain,this was a flat surface that acted as a base for the other parts of the scene, preventing them from just appearing floating. To ensure the floor created did not conflict with the skybox, it was set to be covered by the texture used for the bottom of the skybox. While it is still possible to zoom out and see where the skybox starts and the base ends, the majority of angles are enhanced by this effect and it helps the scene look like it is placed in a forest. 
+### models
+With the scene set, the focus could now be moved to objects within the scene. To start off, the centerpiece (the sword in the stone) was placed. This was placed right in the center of the scene/view as it was intended as the most important part of the scene
 In addition to this main model, other models were placed around to help the scene feel populated. A key example of this is the trees that were placed around. These were placed in a variety of locations to make the setting of the forest around the sword feel present. These were placed around the sword on all sides except the front, allowing for a clear view from where the camera starts. Additionally they were placed 2-3 trees deep on each side to present a populated forest surrounding the sword.
 The trees also serve the purpose of hiding the somewhat harsh transition between the actual trees and the sky box background.
 Another model that was placed in the scene was a butterfly, this was quite a small model but it added some extra colour to the scene and helped the scene feel alive. In addition it had some scene animations allowing it to move back and forth to add life to the scene 
 
-
-# How does your code fit together and how should a programmer navigate it (not intended to be an exercise in formally documenting the code)?
+# How does your code fit together and how should a programmer navigate it 
 ## Libraries/externals used 
+glad: 
+GLFW:
 
 ## Code arrangement 
 The code is built around the template provided and makes use of both C++ code and fragment and vertex shaders. 
@@ -71,6 +78,8 @@ Butterfly: https://www.turbosquid.com/3d-models/butterfly-fly-3d-obj/460590
 ## Partial re use of 3016 
 It should be noted that very small parts of the scene used parts of the 3016 module as a base. For example the code to make the butterfly move back and forth was taken from my second coursework submission for that module. It was not just copied directly however, due to the different sizing of the scene, compared to the scene present in that project the movement speeds and distance was on an entirely different scale. So to adapt this to work with the current scene the movement speed was increased and the amount of time/amount of moves the model moves before turning was increased. In addition, it had its direction changed slightly, in the original code it would either travel vertically or horizontally across the scene requiring just a change to the x coordinate. But for this scene I decided I wanted it to travel diagonally, so the code was adjusted to accommodate for this. The butterfly model itself was also the same used in the 3016 coursework. To see the original source of this please see the section above
 The terrain generation code was also created using code from the 3016 labs to set up a flat piece of ground. This was also adjusted, editing the size of the flat ground to better create the desired ground effect. Before then editing the terrain shader to display a texture over it(please note AI was used as to assist with this, for more information on this please see the use of AI statement)
+## Usage of lab code 
+Please also note that the code in this assignement is heavily based on different parts of the labs from this module
 # A Link to the unlisted YouTube Video 
 # AI statement
 ![Main menu sample](MDImages/UseOfAI.png) 
