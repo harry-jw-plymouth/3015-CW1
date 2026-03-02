@@ -1,9 +1,8 @@
-# Important
+# Important 
 ## Add video link 
-## Check over AI statement 
-
 
 # 3015-CW1
+By Harry Watton
 # System information
 ## Visual studio version:2022
 ## Operating system: Windows 11
@@ -35,6 +34,8 @@ Another model that was placed in the scene was a butterfly, this was quite a sma
 -GLFW
 -GLM
 -Open gl
+
+In addition, external code provided by this module (Comp 3015) was used
 
 ## Code arrangement 
 The code is built around the template provided and makes use of both C++ code and fragment and vertex shaders. 
@@ -95,7 +96,7 @@ A full list of 3d generated assetts are detailed below(all files detailed below 
 - Sword normal map texture
 - tree bark texture
 During development, the intention was to implement normal mapping, and for this purpose a normal map of the sword texture was created which was done with AI. While this was not used in the final version it can be seen in the files.
-Note:Model creation with AI was experimented with but the desired results could not be created so the models were instead found online
+Note:Model creation with AI was experimented with but the desired results could not be created to a standard I was happy with. Therefore the models were instead found online
 ### code assistant
 AI tools were used throughout development as a coding assistant. 
 #### Debugging
@@ -104,7 +105,4 @@ A key example of how generative AI was used for code assistance debugging. When 
 It was also used as a coding assistant to advise on how to move forward with sections I was not initially sure how too initally. 
 For example, when programming the camera movement, I was unsure initially how to edit the position and use GLFW functionality as the GLFW window was in scene runner and thus innacessible to the code in scene basic unfiform where I wanted to place the code. The AI suggested the solution (mentioned in the how does it work section) which I was then able to implement 
 Another key example of where AI was used was for correctly setting up the texture on the terrain. Originally when setting this up the texture would repeat for every single "square" in the terrain, as the fragment shader was treating each square as an entirely separate object. This made the terrain look unusual and far from what was desired. While I was understanding the issue,I was unable to figure out exactly how to fix it. For this reason AI was used to point out where I was going wrong, suggesting the addition of new uniform values allowing the code to calculate which bit of the texture should be rendered on each "square" of the terrain grid.
-It was also a great help in shaders when it came to assisting with solving issues as this was an area where lots of issues arose when developing
-
-
-
+It was also a great help in shaders when it came to assisting with solving issues as this was a key area where unexpected things could occur
