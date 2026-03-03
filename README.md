@@ -13,9 +13,16 @@ By Harry Watton
 Using the GLFW library, the ability to move the camera/view was implemented. Using GLFW key detection WASD movement was implemented, this was done by using the code from the 3016 module as a base, then reworking it to fit in with the template and code used in this prototype. To actually get the code to recognise the key inputs and act on them,the 'ProcessUserInput' was first created in the Scenebasic_uniform class(this was where the code to move the camera position was placed).
 Then in the 'mainLoop' in scenerunner, glfw will check for inputs, and if a key was pressed it will call the previously mentioned function, passing the pressed key so it can act accordingly. In addition a virtual instance of the ProcessUserInput function was placed in Scene.h to allow the code in Scenerunner to access it. The function in scenebasic uniform then overrides this. 
 The end result of this allowed for the WASD keys to act as direction inputs, with W as forward,a as left, s as back and d as right
+![virtual functions](MDImages/Virtual.png)
+![Scennrunner](MDImages/SceneRunnerInput.png)
+![Input function](MDImages/ProcessInput.png)
 ### Mouse controls
 Similar was done with mouse controls, with a function placed in scene basic uniform and then a reference added in scene.h. In addition this function was set to mouse call back in scene runner.h 
+
+![Set curso4 call back](MDImages/CursorCallBacl.png)
+
 The end result was the mouse controlling the direction of the camera allowing for the user to see the scene with a view from many angles
+![Mouse call back functions](MDImages/MouseCall.png)
 
 ## How the scene elements fits together 
 The scene itself has multiple parts which all come together to make the complete scene.
@@ -70,7 +77,9 @@ The Init scene function was where all the key parts of the scene were set up. No
 #### rendering
 Render was the function where all code associated with rendering was placed. The function was called frequently, constantly re-rendering the scene to keep the view up to date with any transformations that have occurred. For ease of organising code, different rendering parts were put into their own functions which were then called by render. For example the sword object has its own function that sets the model to the right position and then renders it. 
 In the process of rendering, the shaders are interacted with, allowing for values in the shaders to be updated to ensure they render in accordance with the current scene. For example the light position is passed to ensure that when a model is rendered the light is placed correctly
-#### updating
+
+![Render function](MDImages/Render.png)
+#### Updating
 The positions of various things throughout the scene are updated each frame (For example the position of the light and the position of the butterfly). This updating was done in the update function to keep it seperate from rendering code. 
 The position of the camera is also updated to account for the users inputs
 ![Update function](MDImages/Update.png)
