@@ -65,10 +65,10 @@ These files from the template were modified slightly to allow for GLFW inputs to
 Please note, Ai was used to assist with connecting the functions in scene basic uniform. For more information on this please see the AI statement late in this document
 ### Scenebasic uniform 
 #### Initialising 
-[init scene function](MDImages/InitScene)
-The Init scene function was where all the key parts of the scene were set up 
+![init scene function](MDImages/InitScene.png)
+The Init scene function was where all the key parts of the scene were set up. Notably (Mostly through functions called here)the shaders are compiled, vertexes for the terrain are created, the skybox is setup, the eye start position is set and some light values are set, this creates the base of the scene for the rendering later
 #### rendering
-Render was the function where all code associated with rendering was placed. The function was called frequently, constantly re-rendering the scene to keep the view up to date with any transformations that have occurred. For ease of organising code, different rendering parts were put into their own functions which were then called by render. For example the sword object has its own function that sets the model to the right position and then renders it. A fu
+Render was the function where all code associated with rendering was placed. The function was called frequently, constantly re-rendering the scene to keep the view up to date with any transformations that have occurred. For ease of organising code, different rendering parts were put into their own functions which were then called by render. For example the sword object has its own function that sets the model to the right position and then renders it. 
 In the process of rendering, the shaders are interacted with, allowing for values in the shaders to be updated to ensure they render in accordance with the current scene. For example the light position is passed to ensure that when a model is rendered the light is placed correctly
 #### updating
 
