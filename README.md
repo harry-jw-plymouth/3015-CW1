@@ -71,7 +71,10 @@ The Init scene function was where all the key parts of the scene were set up. No
 Render was the function where all code associated with rendering was placed. The function was called frequently, constantly re-rendering the scene to keep the view up to date with any transformations that have occurred. For ease of organising code, different rendering parts were put into their own functions which were then called by render. For example the sword object has its own function that sets the model to the right position and then renders it. 
 In the process of rendering, the shaders are interacted with, allowing for values in the shaders to be updated to ensure they render in accordance with the current scene. For example the light position is passed to ensure that when a model is rendered the light is placed correctly
 #### updating
-
+The positions of various things throughout the scene are updated each frame (For example the position of the light and the position of the butterfly). This updating was done in the update function to keep it seperate from rendering code. 
+The position of the camera is also updated to account for the users inputs
+![Update function](MDImages/Update.png)
+Please note the code for updating the light position was an edited version of code from one of the labs for this module
 
 
 # Anything else which will help us to understand how your prototype works.
