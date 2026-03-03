@@ -1,6 +1,3 @@
-# Important 
-## Add video link 
-
 # 3015-CW1
 By Harry Watton
 # System information
@@ -99,7 +96,8 @@ It should be noted that very small parts of the scene used parts of the 3016 mod
 The terrain generation code was also created using code from the 3016 labs to set up a flat piece of ground. This was also adjusted, editing the size of the flat ground to better create the desired ground effect. Before then editing the terrain shader to display a texture over it(please note AI was used as to assist with this, for more information on this please see the use of AI statement)
 ## Usage of lab code 
 Please also note that the code in this assignment is heavily based on different parts of the labs from this module
-# A Link to the unlisted YouTube Video 
+# Video link
+https://youtu.be/nrzl5l4i5oE 
 # AI statement
 ![Main menu sample](MDImages/UseOfAI.png) 
 ![Ai signature](MDImages/Ai_Signature.png)  
