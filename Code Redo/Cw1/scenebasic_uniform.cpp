@@ -79,9 +79,9 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(50.0f,50.0f,1,1),
     teapot(14,glm::mat4(1.0f)),
     torus(1.75f*0.75f,1.75f*0.75f,50,50) {
-    Butterfly = ObjMesh::load("../Cw1/media/Butterfly/_butterfly.obj");
-    SwordInStone = ObjMesh::load("../Cw1/media/low poly sword in stone.obj", true);
-    Tree = ObjMesh::load("../Cw1/media/Tree.obj");
+    Butterfly = ObjMesh::load("media/Butterfly/_butterfly.obj");
+    SwordInStone = ObjMesh::load("media/low poly sword in stone.obj", true);
+    Tree = ObjMesh::load("media/Tree.obj");
 }
 void SceneBasic_Uniform::SetUpTerrain() {
     //code was taken with some adjustments from 3016
@@ -204,7 +204,7 @@ void SceneBasic_Uniform::SetupSkybox() {
     projection = mat4(1.0f);
     model = mat4(1.0f);
     angle = glm::radians(90.0f);
-    GLuint SkyBoxTexture = Texture::loadCubeMap("../Cw1/media/texture/ForestSkyBox/Forest");
+    GLuint SkyBoxTexture = Texture::loadCubeMap("media/texture/ForestSkyBox/Forest");
     //  GLuint SkyBoxTexture = Texture::loadHdrCubeMap("../Cw1/media/texture/Skybox/Forest/forest-skyboxes/Brudslojan");
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxTexture);
